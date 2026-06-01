@@ -1413,10 +1413,63 @@
 
 
 <script>
+/* ========== MARKETING ATTRIBUTION (UTM + referrer + device) ========== */
+(function () {
+  const KEY = 'sb_attribution';
+  /* 이미 저장된 최초 유입정보가 있으면 유지 (first-touch) */
+  if (sessionStorage.getItem(KEY)) return;
+
+  const params = new URLSearchParams(location.search);
+  const ref = document.referrer || '';
+
+  /* utm_source 우선, 없으면 referrer로 추론 */
+  let source = params.get('utm_source') || '';
+  let medium = params.get('utm_medium') || '';
+  const campaign = params.get('utm_campaign') || '';
+
+  if (!source) {
+    const r = ref.toLowerCase();
+    if (r.includes('instagram')) source = 'instagram';
+    else if (r.includes('naver')) source = 'naver';
+    else if (r.includes('youtube') || r.includes('youtu.be')) source = 'youtube';
+    else if (r.includes('kakao')) source = 'kakao';
+    else if (r.includes('google')) source = 'google';
+    else if (r.includes('daangn') || r.includes('karrot')) source = 'daangn';
+    else if (r.includes('facebook') || r.includes('fb.')) source = 'facebook';
+    else if (ref) source = 'referral';
+    else source = 'direct';
+    if (!medium && ref) medium = 'referral';
+  }
+
+  /* 디바이스 추정 */
+  const ua = navigator.userAgent;
+  const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(ua);
+  const device = isMobile ? 'mobile' : 'desktop';
+
+  sessionStorage.setItem(KEY, JSON.stringify({
+    source: source, medium: medium, campaign: campaign, device: device,
+    referrer: ref, landedAt: new Date().toISOString()
+  }));
+})();
+
+function getAttribution() {
+  try {
+    const raw = sessionStorage.getItem('sb_attribution');
+    if (raw) return JSON.parse(raw);
+  } catch (e) {}
+  const ua = navigator.userAgent;
+  return {
+    source: 'direct', medium: '', campaign: '',
+    device: /Android|iPhone|iPad|iPod|Mobile/i.test(ua) ? 'mobile' : 'desktop'
+  };
+}
+</script>
+
+<script>
 /* ========== SURVEY MULTI-STEP FORM ========== */
 (function () {
   /* ⚠️ Google Apps Script Web App URL — 세팅 완료 후 아래 주소를 교체하세요 */
-  const FORM_ENDPOINT = 'https://script.google.com/macros/s/AKfycbxGGtR0WMGAcJMRnoDAG59GWi9wTtQz6b7-WvwSQhW1lBavGNcutVISJERgy55qX3xU/exec';
+  const FORM_ENDPOINT = 'https://script.google.com/macros/s/AKfycbyMmDJcm7cu3hvUcDaI_q20VR-gJEyHeJDCRMLMOZvGuMaWlnpgJkel-4eUbdLnLmMI/exec';
 
   const form = document.getElementById('surveyForm');
   if (!form) return;
@@ -1650,6 +1703,7 @@
         files = await Promise.all(Array.from(data.file).map(fileToBase64));
       }
 
+      const attribution = getAttribution();
       const payload = {
         name: data.name,
         phone: data.phone,
@@ -1663,7 +1717,10 @@
         notes: data.notes,
         files: files,
         submittedAt: new Date().toISOString(),
-        source: 'Space Baker Landing'
+        source: attribution.source,
+        medium: attribution.medium,
+        campaign: attribution.campaign,
+        device: attribution.device
       };
 
       if (FORM_ENDPOINT && FORM_ENDPOINT !== 'PASTE_YOUR_APPS_SCRIPT_WEB_APP_URL_HERE') {
@@ -1694,7 +1751,7 @@
 <script>
 /* ========== PORTFOLIO DYNAMIC LOADER + LIGHTBOX ========== */
 (function () {
-  const ENDPOINT = 'https://script.google.com/macros/s/AKfycbxGGtR0WMGAcJMRnoDAG59GWi9wTtQz6b7-WvwSQhW1lBavGNcutVISJERgy55qX3xU/exec';
+  const ENDPOINT = 'https://script.google.com/macros/s/AKfycbyMmDJcm7cu3hvUcDaI_q20VR-gJEyHeJDCRMLMOZvGuMaWlnpgJkel-4eUbdLnLmMI/exec';
   const list = document.getElementById('portList');
   const lb = document.getElementById('lightbox');
   if (!list || !ENDPOINT) return;
