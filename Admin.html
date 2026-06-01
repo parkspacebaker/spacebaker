@@ -1,0 +1,991 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SPACE BAKER · Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;800;900&display=swap" />
+<style>
+  :root {
+    --bg: #F4F2EE; --panel: #FFFFFF; --ink: #0A0A0A; --ink-2: #3A3631;
+    --ink-3: #807A72; --ink-4: #B5B0A8; --line: #E8E4DC; --line-2: #F0ECE4;
+    --gold: #B8860B; --lime: #E1F800; --lime-soft: #F2FCB0;
+    --blue: #2A6FDB; --green: #1F8A5B; --amber: #C98A1A; --red: #D24545;
+    --radius: 14px;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: "Noto Sans KR", system-ui, -apple-system, sans-serif;
+    background: var(--bg); color: var(--ink);
+    -webkit-font-smoothing: antialiased; letter-spacing: -0.01em; font-size: 14px;
+  }
+  .mono { font-family: ui-monospace, "SF Mono", Menlo, monospace; }
+  button { font-family: inherit; }
+
+  /* ===== LOGIN ===== */
+  .login {
+    position: fixed; inset: 0; background: #14120F;
+    display: flex; align-items: center; justify-content: center; z-index: 100;
+  }
+  .login-card {
+    background: #fff; border-radius: 18px; padding: 40px 34px; width: 340px;
+    box-shadow: 0 30px 80px -20px rgba(0,0,0,0.5);
+  }
+  .login-card .brand { font-size: 20px; font-weight: 800; letter-spacing: -0.025em; color: var(--ink); }
+  .login-card .brand sup { font-size: 10px; color: var(--gold); vertical-align: super; }
+  .login-card .sub { font-size: 12px; color: var(--ink-3); margin: 4px 0 26px; letter-spacing: 0.06em; }
+  .login-card label { font-size: 12px; font-weight: 700; color: var(--ink-2); display: block; margin-bottom: 8px; }
+  .login-card input {
+    width: 100%; padding: 13px 14px; border: 1px solid var(--line); border-radius: 10px;
+    font-size: 15px; font-family: inherit; -webkit-appearance: none;
+  }
+  .login-card input:focus { outline: none; border-color: var(--ink); box-shadow: 0 0 0 3px rgba(225,248,0,0.3); }
+  .login-card .err { color: var(--red); font-size: 12px; margin-top: 8px; min-height: 16px; }
+  .login-card button {
+    width: 100%; margin-top: 16px; padding: 14px; background: var(--ink); color: #fff;
+    border: none; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer;
+  }
+  .login-card button:disabled { opacity: 0.5; cursor: default; }
+
+  /* ===== Layout ===== */
+  .app { display: none; min-height: 100vh; }
+  .app.show { display: flex; }
+  .sidebar {
+    width: 220px; flex-shrink: 0; background: #14120F; color: #C8C2BA;
+    padding: 26px 16px; display: flex; flex-direction: column;
+    position: sticky; top: 0; height: 100vh;
+  }
+  .brand { font-size: 17px; font-weight: 800; color: #fff; letter-spacing: -0.02em; padding: 0 10px 4px; }
+  .brand sup { font-size: 9px; color: var(--lime); vertical-align: super; }
+  .brand-sub { font-size: 10px; color: #6E675F; letter-spacing: 0.14em; padding: 0 10px 26px; text-transform: uppercase; }
+  .nav-group-label { font-size: 10px; color: #5F5950; letter-spacing: 0.12em; padding: 14px 10px 8px; text-transform: uppercase; }
+  .nav-item {
+    display: flex; align-items: center; gap: 11px; padding: 10px; border-radius: 9px;
+    color: #ABA59C; font-size: 13.5px; font-weight: 500; cursor: pointer;
+    transition: background 0.15s, color 0.15s; margin-bottom: 2px;
+  }
+  .nav-item svg { width: 17px; height: 17px; flex-shrink: 0; }
+  .nav-item:hover { background: rgba(255,255,255,0.05); color: #fff; }
+  .nav-item.active { background: var(--lime); color: #14120F; font-weight: 700; }
+  .nav-item .badge { margin-left: auto; background: rgba(255,255,255,0.12); color: #fff; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 999px; }
+  .nav-item.active .badge { background: #14120F; color: var(--lime); }
+  .sidebar-foot { margin-top: auto; padding: 12px 10px 0; border-top: 1px solid rgba(255,255,255,0.08); font-size: 11px; color: #6E675F; }
+  .sidebar-foot .me { display: flex; align-items: center; gap: 9px; color: #ABA59C; padding-top: 12px; }
+  .sidebar-foot .avatar { width: 28px; height: 28px; border-radius: 50%; background: var(--lime); color: #14120F; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 12px; }
+  .logout { margin-top: 10px; font-size: 11px; color: #6E675F; cursor: pointer; padding: 6px 0; }
+  .logout:hover { color: #ABA59C; }
+
+  .main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+  .topbar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 20px 28px; background: var(--panel); border-bottom: 1px solid var(--line);
+    position: sticky; top: 0; z-index: 10;
+  }
+  .topbar h1 { font-size: 20px; font-weight: 800; margin: 0; letter-spacing: -0.025em; }
+  .topbar .sub { font-size: 12px; color: var(--ink-3); margin-top: 2px; }
+  .topbar-actions { display: flex; align-items: center; gap: 10px; }
+  .icon-btn {
+    width: 38px; height: 38px; border-radius: 9px; border: 1px solid var(--line);
+    background: var(--bg); cursor: pointer; display: flex; align-items: center; justify-content: center;
+  }
+  .icon-btn svg { width: 16px; height: 16px; }
+  .icon-btn.spin svg { animation: spin 0.8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .date-pill { font-size: 12px; color: var(--ink-2); font-weight: 600; background: var(--bg); padding: 9px 14px; border-radius: 9px; border: 1px solid var(--line); display: flex; align-items: center; gap: 8px; }
+
+  .content { padding: 26px 28px 60px; }
+  .view { display: none; }
+  .view.show { display: block; animation: fade 0.25s ease; }
+  @keyframes fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+  .loading-state { text-align: center; padding: 80px 20px; color: var(--ink-3); }
+  .loading-state .sp { width: 32px; height: 32px; border: 3px solid var(--line); border-top-color: var(--gold); border-radius: 50%; margin: 0 auto 16px; animation: spin 0.8s linear infinite; }
+
+  /* Stat cards */
+  .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 24px; }
+  .stat-card { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; }
+  .stat-card .top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+  .stat-card .ico { width: 34px; height: 34px; border-radius: 9px; display: flex; align-items: center; justify-content: center; }
+  .stat-card .ico svg { width: 17px; height: 17px; }
+  .ico.lime { background: var(--lime-soft); color: #5A6400; }
+  .ico.blue { background: #E4EDFB; color: var(--blue); }
+  .ico.green { background: #E0F2EA; color: var(--green); }
+  .ico.amber { background: #FBF0DC; color: var(--amber); }
+  .stat-card .num { font-size: 30px; font-weight: 800; letter-spacing: -0.03em; line-height: 1; }
+  .stat-card .num .unit { font-size: 15px; color: var(--ink-3); font-weight: 700; }
+  .stat-card .label { font-size: 12.5px; color: var(--ink-3); margin-top: 7px; font-weight: 500; }
+
+  .cols { display: grid; grid-template-columns: 1.55fr 1fr; gap: 18px; margin-bottom: 18px; }
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+  .panel-head { display: flex; align-items: center; justify-content: space-between; padding: 18px 20px; border-bottom: 1px solid var(--line-2); }
+  .panel-head h2 { font-size: 15px; font-weight: 800; margin: 0; letter-spacing: -0.02em; }
+  .panel-head .link { font-size: 12px; color: var(--ink-3); cursor: pointer; font-weight: 600; }
+  .panel-head .link:hover { color: var(--gold); }
+
+  .source-list { padding: 16px 20px 20px; }
+  .source-row { margin-bottom: 15px; }
+  .source-row:last-child { margin-bottom: 0; }
+  .source-row .sr-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 7px; }
+  .source-row .sr-name { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; }
+  .source-row .sr-dot { width: 9px; height: 9px; border-radius: 50%; }
+  .source-row .sr-val { font-size: 12.5px; color: var(--ink-3); font-weight: 600; }
+  .source-row .sr-val b { color: var(--ink); font-weight: 800; }
+  .bar-track { height: 8px; background: var(--bg); border-radius: 999px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 999px; transition: width 0.5s ease; }
+  .empty-mini { padding: 30px 20px; text-align: center; color: var(--ink-4); font-size: 13px; }
+
+  /* Table */
+  .tbl { width: 100%; border-collapse: collapse; }
+  .tbl thead th { text-align: left; font-size: 11px; color: var(--ink-3); font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; padding: 12px 20px; border-bottom: 1px solid var(--line-2); background: #FBFAF8; }
+  .tbl tbody td { padding: 14px 20px; border-bottom: 1px solid var(--line-2); font-size: 13px; vertical-align: middle; }
+  .tbl tbody tr { cursor: pointer; transition: background 0.12s; }
+  .tbl tbody tr:hover { background: #FBFAF8; }
+  .tbl tbody tr:last-child td { border-bottom: none; }
+  .cust { display: flex; flex-direction: column; gap: 2px; }
+  .cust .nm { font-weight: 700; }
+  .cust .ph { font-size: 11.5px; color: var(--ink-3); }
+  .chips { display: flex; flex-wrap: wrap; gap: 4px; }
+  .chip { font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 6px; background: var(--bg); color: var(--ink-2); border: 1px solid var(--line); }
+  .src-tag { display: inline-flex; align-items: center; gap: 6px; font-size: 11.5px; font-weight: 700; padding: 4px 9px; border-radius: 999px; }
+  .src-tag .d { width: 7px; height: 7px; border-radius: 50%; }
+  .when { font-size: 12px; color: var(--ink-3); white-space: nowrap; }
+  .status { font-size: 11.5px; font-weight: 700; padding: 5px 11px; border-radius: 999px; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+  .status .d { width: 6px; height: 6px; border-radius: 50%; }
+
+  /* mini-grid */
+  .mini-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  .donut-wrap { display: flex; align-items: center; gap: 18px; padding: 18px 20px 20px; }
+  .donut { width: 110px; height: 110px; flex-shrink: 0; }
+  .donut-legend { flex: 1; }
+  .leg-row { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; font-size: 12.5px; }
+  .leg-row .d { width: 10px; height: 10px; border-radius: 3px; }
+  .leg-row .lv { margin-left: auto; font-weight: 800; }
+  .leg-row .ll { color: var(--ink-2); font-weight: 500; }
+
+  /* Inquiries view: filter bar */
+  .filterbar { display: flex; gap: 8px; margin-bottom: 18px; flex-wrap: wrap; align-items: center; }
+  .filter-chip { padding: 8px 14px; border-radius: 999px; border: 1px solid var(--line); background: var(--panel); font-size: 13px; font-weight: 600; color: var(--ink-2); cursor: pointer; transition: all 0.12s; }
+  .filter-chip:hover { border-color: var(--ink-4); }
+  .filter-chip.active { background: var(--ink); color: #fff; border-color: var(--ink); }
+  .filter-chip .cnt { color: var(--ink-4); margin-left: 4px; font-weight: 700; }
+  .filter-chip.active .cnt { color: var(--lime); }
+  .search-box { margin-left: auto; position: relative; }
+  .search-box input { padding: 9px 14px 9px 34px; border: 1px solid var(--line); border-radius: 9px; font-size: 13px; font-family: inherit; width: 200px; background: var(--panel); }
+  .search-box input:focus { outline: none; border-color: var(--ink); }
+  .search-box svg { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; color: var(--ink-4); }
+
+  /* Detail drawer */
+  .drawer-overlay { position: fixed; inset: 0; background: rgba(10,8,6,0.4); z-index: 50; display: none; }
+  .drawer-overlay.show { display: block; }
+  .drawer {
+    position: fixed; top: 0; right: 0; bottom: 0; width: 440px; max-width: 92vw;
+    background: #fff; z-index: 51; transform: translateX(100%); transition: transform 0.3s cubic-bezier(.3,.7,.4,1);
+    overflow-y: auto; box-shadow: -20px 0 60px -20px rgba(0,0,0,0.3);
+  }
+  .drawer.show { transform: translateX(0); }
+  .drawer-head { padding: 24px 26px 18px; border-bottom: 1px solid var(--line); position: sticky; top: 0; background: #fff; z-index: 2; }
+  .drawer-head .dh-top { display: flex; align-items: flex-start; justify-content: space-between; }
+  .drawer-head .nm { font-size: 22px; font-weight: 800; letter-spacing: -0.025em; }
+  .drawer-head .ph { font-size: 14px; color: var(--gold); font-weight: 700; margin-top: 2px; }
+  .drawer-head .close { width: 34px; height: 34px; border-radius: 50%; border: none; background: var(--bg); cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; color: var(--ink-2); }
+  .drawer-head .meta-row { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
+  .drawer-body { padding: 22px 26px 40px; }
+  .d-field { margin-bottom: 18px; }
+  .d-field .k { font-size: 11px; color: var(--ink-3); font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; margin-bottom: 5px; }
+  .d-field .v { font-size: 14px; color: var(--ink); font-weight: 500; line-height: 1.5; }
+  .d-field .v.pre { white-space: pre-wrap; }
+  .d-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  .d-sep { height: 1px; background: var(--line-2); margin: 6px 0 20px; }
+  .status-select { display: flex; flex-wrap: wrap; gap: 6px; }
+  .status-opt { padding: 8px 13px; border-radius: 8px; border: 1px solid var(--line); background: #fff; font-size: 12.5px; font-weight: 700; cursor: pointer; color: var(--ink-3); }
+  .status-opt.sel { color: #fff; }
+  .memo-area { width: 100%; min-height: 90px; padding: 12px; border: 1px solid var(--line); border-radius: 10px; font-family: inherit; font-size: 13.5px; resize: vertical; line-height: 1.5; }
+  .memo-area:focus { outline: none; border-color: var(--ink); }
+  .save-btn { margin-top: 12px; width: 100%; padding: 13px; background: var(--gold); color: #fff; border: none; border-radius: 10px; font-weight: 700; font-size: 14px; cursor: pointer; }
+  .save-btn:hover { background: #a3760a; }
+  .save-btn:disabled { opacity: 0.5; }
+  .d-files a { display: inline-block; color: var(--blue); font-size: 13px; margin-right: 12px; word-break: break-all; }
+  .call-btn { display: inline-flex; align-items: center; gap: 7px; background: var(--ink); color: #fff; text-decoration: none; padding: 11px 18px; border-radius: 999px; font-weight: 700; font-size: 13px; margin-top: 4px; }
+  .call-btn svg { width: 14px; height: 14px; }
+
+  .toast { position: fixed; bottom: 26px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--ink); color: #fff; padding: 13px 22px; border-radius: 999px; font-size: 13px; font-weight: 600; opacity: 0; transition: all 0.3s; z-index: 200; pointer-events: none; }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* ===== Portfolio admin ===== */
+  .btn-add { display: inline-flex; align-items: center; gap: 7px; background: var(--ink); color: #fff; border: none; padding: 11px 18px; border-radius: 9px; font-size: 13px; font-weight: 700; cursor: pointer; }
+  .btn-add svg { width: 15px; height: 15px; }
+  .pf-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+  .pf-card { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+  .pf-cover { position: relative; aspect-ratio: 4/3; background: var(--bg); overflow: hidden; }
+  .pf-cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .pf-cover .ph { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: var(--ink-4); font-size: 12px; }
+  .pf-cover .order-badge { position: absolute; top: 10px; left: 10px; background: rgba(10,10,10,0.8); color: #fff; font-size: 11px; font-weight: 700; padding: 4px 9px; border-radius: 999px; }
+  .pf-cover .cnt-badge { position: absolute; top: 10px; right: 10px; background: var(--lime); color: #14120F; font-size: 11px; font-weight: 700; padding: 4px 9px; border-radius: 999px; }
+  .pf-body { padding: 14px 16px 16px; }
+  .pf-body .ttl { font-size: 15px; font-weight: 800; letter-spacing: -0.02em; }
+  .pf-body .meta { font-size: 12px; color: var(--ink-3); margin-top: 3px; }
+  .pf-body .tag-chip { display: inline-block; font-size: 11px; font-weight: 700; color: #5A6400; background: var(--lime-soft); padding: 3px 8px; border-radius: 6px; margin-top: 8px; }
+  .pf-actions { display: flex; gap: 6px; margin-top: 14px; }
+  .pf-btn { flex: 1; padding: 9px; border-radius: 8px; border: 1px solid var(--line); background: #fff; font-size: 12.5px; font-weight: 700; cursor: pointer; color: var(--ink-2); }
+  .pf-btn:hover { border-color: var(--ink-4); }
+  .pf-btn.danger { color: var(--red); }
+  .pf-btn.danger:hover { border-color: var(--red); }
+  .pf-reorder { display: flex; gap: 4px; }
+  .pf-reorder button { width: 30px; padding: 9px 0; border-radius: 8px; border: 1px solid var(--line); background: #fff; cursor: pointer; color: var(--ink-3); font-size: 13px; }
+  .pf-reorder button:hover { border-color: var(--ink-4); color: var(--ink); }
+  .pf-empty { grid-column: 1/-1; text-align: center; padding: 60px 20px; color: var(--ink-4); }
+
+  .modal-overlay { position: fixed; inset: 0; background: rgba(10,8,6,0.5); z-index: 60; display: none; }
+  .modal-overlay.show { display: block; }
+  .modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -48%); width: 560px; max-width: 94vw; max-height: 90vh; overflow-y: auto; background: #fff; border-radius: 16px; z-index: 61; display: none; box-shadow: 0 30px 80px -20px rgba(0,0,0,0.5); }
+  .modal.show { display: block; animation: modalIn 0.25s ease; }
+  @keyframes modalIn { from { opacity: 0; transform: translate(-50%, -44%); } to { opacity: 1; transform: translate(-50%, -48%); } }
+  .modal-head { padding: 22px 26px 16px; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; background: #fff; z-index: 2; }
+  .modal-head h2 { font-size: 18px; font-weight: 800; margin: 0; letter-spacing: -0.025em; }
+  .modal-head .close { width: 32px; height: 32px; border-radius: 50%; border: none; background: var(--bg); cursor: pointer; font-size: 15px; color: var(--ink-2); }
+  .modal-body { padding: 22px 26px 28px; }
+  .mf { margin-bottom: 16px; }
+  .mf label { font-size: 12px; font-weight: 700; color: var(--ink-2); display: block; margin-bottom: 7px; }
+  .mf input, .mf textarea, .mf select { width: 100%; padding: 11px 13px; border: 1px solid var(--line); border-radius: 9px; font-size: 14px; font-family: inherit; -webkit-appearance: none; }
+  .mf input:focus, .mf textarea:focus, .mf select:focus { outline: none; border-color: var(--ink); }
+  .mf textarea { min-height: 70px; resize: vertical; line-height: 1.5; }
+  .mf-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .dropzone { border: 2px dashed var(--line); border-radius: 12px; padding: 26px 16px; text-align: center; cursor: pointer; transition: all 0.15s; }
+  .dropzone:hover, .dropzone.drag { border-color: var(--gold); background: var(--lime-soft); }
+  .dropzone svg { width: 26px; height: 26px; color: var(--ink-3); margin-bottom: 8px; }
+  .dropzone .dz-t { font-size: 13px; font-weight: 600; color: var(--ink-2); }
+  .dropzone .dz-s { font-size: 11.5px; color: var(--ink-3); margin-top: 3px; }
+  .thumb-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 8px; margin-top: 14px; }
+  .thumb-item { position: relative; aspect-ratio: 1; border-radius: 9px; overflow: hidden; border: 2px solid transparent; background: var(--bg); }
+  .thumb-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .thumb-item.main { border-color: var(--gold); }
+  .thumb-item .star { position: absolute; top: 4px; left: 4px; width: 22px; height: 22px; border-radius: 50%; border: none; background: rgba(10,10,10,0.6); color: #fff; cursor: pointer; font-size: 12px; display: flex; align-items: center; justify-content: center; }
+  .thumb-item.main .star { background: var(--gold); }
+  .thumb-item .del { position: absolute; top: 4px; right: 4px; width: 22px; height: 22px; border-radius: 50%; border: none; background: rgba(10,10,10,0.6); color: #fff; cursor: pointer; font-size: 11px; }
+  .thumb-item .main-label { position: absolute; bottom: 0; left: 0; right: 0; background: var(--gold); color: #14120F; font-size: 9px; font-weight: 800; text-align: center; padding: 2px; }
+  .thumb-item.uploading { display: flex; align-items: center; justify-content: center; }
+  .thumb-item.uploading::after { content: ""; width: 18px; height: 18px; border: 2px solid var(--line); border-top-color: var(--gold); border-radius: 50%; animation: spin 0.8s linear infinite; }
+  .upload-progress { margin-top: 12px; font-size: 12.5px; color: var(--ink-3); display: none; }
+  .upload-progress.show { display: block; }
+  .upload-progress .pbar { height: 6px; background: var(--bg); border-radius: 999px; overflow: hidden; margin-top: 6px; }
+  .upload-progress .pfill { height: 100%; background: var(--gold); border-radius: 999px; transition: width 0.2s; }
+  .modal-foot { padding: 16px 26px 24px; display: flex; gap: 10px; }
+  .modal-foot button { flex: 1; padding: 13px; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; border: none; }
+  .modal-foot .cancel { background: var(--bg); color: var(--ink-2); }
+  .modal-foot .save { background: var(--gold); color: #fff; }
+  .modal-foot .save:disabled { opacity: 0.5; }
+
+  @media (max-width: 1100px) { .stat-grid { grid-template-columns: 1fr 1fr; } .cols { grid-template-columns: 1fr; } .mini-grid { grid-template-columns: 1fr; } }
+  @media (max-width: 760px) { .sidebar { display: none; } .content { padding: 18px 16px 50px; } .topbar { padding: 16px; } .search-box input { width: 130px; } }
+</style>
+</head>
+<body>
+
+<!-- ===== LOGIN ===== -->
+<div class="login" id="loginScreen">
+  <div class="login-card">
+    <div class="brand">space baker<sup>®</sup></div>
+    <div class="sub">ADMIN CONSOLE</div>
+    <label for="pw">관리자 비밀번호</label>
+    <input type="password" id="pw" placeholder="비밀번호 입력" autocomplete="current-password" />
+    <div class="err" id="loginErr"></div>
+    <button id="loginBtn">로그인</button>
+  </div>
+</div>
+
+<!-- ===== APP ===== -->
+<div class="app" id="app">
+  <aside class="sidebar">
+    <div class="brand">space baker<sup>®</sup></div>
+    <div class="brand-sub">Admin Console</div>
+    <div class="nav-group-label">Main</div>
+    <div class="nav-item active" data-view="dashboard">
+      <svg viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="7" height="9" rx="1.5" stroke="currentColor" stroke-width="1.7"/><rect x="14" y="3" width="7" height="5" rx="1.5" stroke="currentColor" stroke-width="1.7"/><rect x="14" y="12" width="7" height="9" rx="1.5" stroke="currentColor" stroke-width="1.7"/><rect x="3" y="16" width="7" height="5" rx="1.5" stroke="currentColor" stroke-width="1.7"/></svg>
+      대시보드
+    </div>
+    <div class="nav-item" data-view="inquiries">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M4 5h16M4 12h16M4 19h10" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+      상담 신청
+      <span class="badge" id="navNewBadge" style="display:none">0</span>
+    </div>
+    <div class="nav-item" data-view="marketing">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M3 17l5-5 4 3 5-6 4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 21h18" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+      마케팅 분석
+    </div>
+    <div class="nav-item" data-view="portfolio">
+      <svg viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="14" rx="2" stroke="currentColor" stroke-width="1.7"/><path d="M3 9h18M8 14h2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+      포트폴리오
+    </div>
+    <div class="sidebar-foot">
+      <div class="me">
+        <div class="avatar">S</div>
+        <div><div style="color:#E8E2D8;font-weight:600;">스페이스베이커</div><div>관리자</div></div>
+      </div>
+      <div class="logout" id="logoutBtn">로그아웃 →</div>
+    </div>
+  </aside>
+
+  <div class="main">
+    <div class="topbar">
+      <div>
+        <h1 id="viewTitle">대시보드</h1>
+        <div class="sub" id="viewSub">마케팅 유입과 상담 신청을 한눈에</div>
+      </div>
+      <div class="topbar-actions">
+        <div class="date-pill" id="datePill">—</div>
+        <button class="icon-btn" id="refreshBtn" title="새로고침">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M3 12a9 9 0 019-9 9 9 0 016.7 3M21 12a9 9 0 01-9 9 9 9 0 01-6.7-3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M18 3v3.5h-3.5M6 21v-3.5h3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="content">
+      <div class="loading-state" id="loadingState"><div class="sp"></div>데이터를 불러오는 중…</div>
+
+      <!-- DASHBOARD -->
+      <div class="view" id="view-dashboard">
+        <div class="stat-grid" id="statGrid"></div>
+        <div class="cols">
+          <div class="panel">
+            <div class="panel-head"><h2>최근 상담 신청</h2><span class="link" data-goto="inquiries">전체 보기 →</span></div>
+            <table class="tbl"><thead><tr><th>고객</th><th>시공 정보</th><th>유입</th><th>상태</th><th>신청</th></tr></thead>
+            <tbody id="recentBody"></tbody></table>
+          </div>
+          <div class="panel">
+            <div class="panel-head"><h2>유입 경로별 신청</h2><span class="link">전체 기간</span></div>
+            <div class="source-list" id="sourceList"></div>
+          </div>
+        </div>
+        <div class="mini-grid">
+          <div class="panel">
+            <div class="panel-head"><h2>접속 디바이스</h2></div>
+            <div class="donut-wrap" id="deviceWrap"></div>
+          </div>
+          <div class="panel">
+            <div class="panel-head"><h2>상태별 현황</h2></div>
+            <div class="source-list" id="statusList"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- INQUIRIES -->
+      <div class="view" id="view-inquiries">
+        <div class="filterbar" id="filterBar"></div>
+        <div class="panel">
+          <table class="tbl"><thead><tr><th>고객</th><th>시공 정보</th><th>예산</th><th>유입</th><th>상태</th><th>신청</th></tr></thead>
+          <tbody id="inqBody"></tbody></table>
+        </div>
+      </div>
+
+      <!-- MARKETING -->
+      <div class="view" id="view-marketing">
+        <div class="stat-grid" id="mktStatGrid"></div>
+        <div class="panel" style="margin-bottom:18px;">
+          <div class="panel-head"><h2>유입 경로별 상세</h2><span class="link">전체 기간</span></div>
+          <div class="source-list" id="mktSourceList"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><h2>유입 경로별 신청 내역</h2></div>
+          <table class="tbl"><thead><tr><th>고객</th><th>유입 경로</th><th>상세/캠페인</th><th>디바이스</th><th>신청</th></tr></thead>
+          <tbody id="mktBody"></tbody></table>
+        </div>
+      </div>
+
+      <!-- PORTFOLIO -->
+      <div class="view" id="view-portfolio">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:12px;">
+          <div style="font-size:13px;color:var(--ink-3);">랜딩페이지에 노출되는 시공 사례를 관리합니다. 추가하면 즉시 반영됩니다.</div>
+          <button class="btn-add" id="addProjectBtn">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            새 시공 사례 추가
+          </button>
+        </div>
+        <div id="portfolioGrid" class="pf-grid"></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- PROJECT EDITOR MODAL -->
+<div class="modal-overlay" id="pfModalOverlay"></div>
+<div class="modal" id="pfModal"></div>
+
+<!-- DETAIL DRAWER -->
+<div class="drawer-overlay" id="drawerOverlay"></div>
+<div class="drawer" id="drawer"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ====== CONFIG ====== */
+const ENDPOINT = 'https://script.google.com/macros/s/AKfycbyMmDJcm7cu3hvUcDaI_q20VR-gJEyHeJDCRMLMOZvGuMaWlnpgJkel-4eUbdLnLmMI/exec';
+
+/* status meta */
+const STATUSES = [
+  { key: '신규', color: '#8A9A00', bg: '#F2FCB0', fg: '#5A6400' },
+  { key: '연락완료', color: '#2A6FDB', bg: '#E4EDFB', fg: '#2A6FDB' },
+  { key: '미팅예약', color: '#C98A1A', bg: '#FBF0DC', fg: '#C98A1A' },
+  { key: '시공중', color: '#1F8A5B', bg: '#E0F2EA', fg: '#1F8A5B' },
+  { key: '종료', color: '#9A9A9A', bg: '#ECECEC', fg: '#6A6A6A' },
+  { key: '취소', color: '#D24545', bg: '#FBE4E4', fg: '#D24545' }
+];
+const SOURCE_META = {
+  instagram: { label: '인스타그램', color: '#C13584' },
+  naver:     { label: '네이버',     color: '#1A9E3C' },
+  youtube:   { label: '유튜브',     color: '#D43A3A' },
+  kakao:     { label: '카카오',     color: '#A8870B' },
+  google:    { label: '구글',       color: '#4285F4' },
+  daangn:    { label: '당근',       color: '#FF6F0F' },
+  facebook:  { label: '페이스북',   color: '#1877F2' },
+  referral:  { label: '기타 유입',  color: '#7A6FAF' },
+  direct:    { label: '직접 유입',  color: '#5A5A5A' }
+};
+function srcMeta(s) { return SOURCE_META[s] || { label: s || '기타', color: '#7A7A7A' }; }
+function statusMeta(k) { return STATUSES.find(s => s.key === k) || STATUSES[0]; }
+
+let PASSWORD = sessionStorage.getItem('sb_admin_pw') || '';
+let DATA = { inquiries: [], stats: null };
+let currentFilter = 'all';
+let searchQuery = '';
+
+/* ====== helpers ====== */
+const $ = (id) => document.getElementById(id);
+function esc(s){ if(s==null) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function nl2br(s){ return esc(s).replace(/\n/g,'<br>'); }
+function toast(msg){ const t=$('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2200); }
+function relTime(ts){
+  if(!ts) return '';
+  const d = new Date(ts.replace(' ','T')+'+09:00');
+  if(isNaN(d)) return ts;
+  const diff = (Date.now()-d.getTime())/1000;
+  if(diff<60) return '방금 전';
+  if(diff<3600) return Math.floor(diff/60)+'분 전';
+  if(diff<86400) return Math.floor(diff/3600)+'시간 전';
+  if(diff<86400*7) return Math.floor(diff/86400)+'일 전';
+  return ts.slice(5,10).replace('-','/');
+}
+
+/* ====== API ====== */
+async function apiPost(body){
+  const res = await fetch(ENDPOINT, {
+    method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'},
+    body: JSON.stringify(body)
+  });
+  return res.json();
+}
+
+async function loadData(){
+  $('loadingState').style.display='block';
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('show'));
+  try {
+    const data = await apiPost({ action:'getAdmin', password: PASSWORD });
+    if(!data.ok){ throw new Error(data.error||'failed'); }
+    DATA = data;
+    renderAll();
+  } catch(err){
+    $('loadingState').innerHTML = '데이터를 불러오지 못했어요.<br>새로고침하거나 다시 로그인해주세요.<br><span style="font-size:11px;color:#B5B0A8">'+esc(String(err.message||err))+'</span>';
+    return;
+  }
+  $('loadingState').style.display='none';
+  showView(activeView);
+}
+
+/* ====== RENDER ====== */
+function renderAll(){
+  renderDashboard();
+  renderInquiries();
+  renderMarketing();
+  const s = DATA.stats || {};
+  $('datePill').textContent = '총 '+(s.total||0)+'건 · 이번 달 '+(s.monthCount||0)+'건';
+  const nb = $('navNewBadge');
+  if(s.newCount>0){ nb.style.display=''; nb.textContent=s.newCount; } else nb.style.display='none';
+}
+
+function statusBadge(st){ const m=statusMeta(st); return '<span class="status" style="background:'+m.bg+';color:'+m.fg+'"><span class="d" style="background:'+m.color+'"></span>'+esc(st)+'</span>'; }
+function srcTag(s){ const m=srcMeta(s); return '<span class="src-tag" style="background:'+m.color+'18;color:'+m.color+'"><span class="d" style="background:'+m.color+'"></span>'+esc(m.label)+'</span>'; }
+
+function renderDashboard(){
+  const s = DATA.stats || {};
+  /* stat cards */
+  $('statGrid').innerHTML = [
+    statCard('lime','M4 5h16M4 12h16M4 19h10', (s.monthCount||0)+'<span class="unit">건</span>','이번 달 상담 신청'),
+    statCard('blue','M12 21C12 21 4 14 4 8.5A4.5 4.5 0 0112 6a4.5 4.5 0 018 2.5C20 14 12 21 12 21z',(s.total||0)+'<span class="unit">건</span>','전체 누적 신청'),
+    statCard('amber','M12 7v5l3 2',( s.newCount||0)+'<span class="unit">건</span>','미처리 신규 신청'),
+    statCard('green','M3 17l5-5 4 3 5-6 4 4',topSourceLabel(s)+'','최다 유입 경로')
+  ].join('');
+
+  /* recent 6 */
+  const recent = DATA.inquiries.slice(0,6);
+  $('recentBody').innerHTML = recent.length ? recent.map(q=>`
+    <tr data-row="${q.row}">
+      <td><div class="cust"><span class="nm">${esc(q.name)}</span><span class="ph">${esc(q.phone)}</span></div></td>
+      <td><div class="chips"><span class="chip">${esc(q.region||'-')} · ${esc(q.area||'')}</span></div></td>
+      <td>${srcTag(q.source)}</td>
+      <td>${statusBadge(q.status)}</td>
+      <td class="when">${relTime(q.submittedAt)}</td>
+    </tr>`).join('') : emptyRow(5);
+  bindRows('recentBody');
+
+  /* source bars */
+  $('sourceList').innerHTML = sourceBars(s.bySource, s.total);
+  /* device donut */
+  $('deviceWrap').innerHTML = deviceDonut(s.byDevice, s.total);
+  /* status list */
+  $('statusList').innerHTML = statusBars(s.byStatus, s.total);
+}
+
+function statCard(ico, path, num, label){
+  return `<div class="stat-card"><div class="top"><div class="ico ${ico}"><svg viewBox="0 0 24 24" fill="none"><path d="${path}" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>${ico==='blue'?'':'<circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="0" fill="none"/>'}</svg></div></div><div class="num">${num}</div><div class="label">${label}</div></div>`;
+}
+function topSourceLabel(s){
+  const bs = s.bySource||{}; let top='-',max=0;
+  Object.keys(bs).forEach(k=>{ if(bs[k]>max){max=bs[k];top=k;} });
+  if(top==='-') return '<span class="unit">없음</span>';
+  return srcMeta(top).label;
+}
+function sourceBars(bySource, total){
+  bySource = bySource||{}; total = total||0;
+  const keys = Object.keys(bySource).sort((a,b)=>bySource[b]-bySource[a]);
+  if(!keys.length) return '<div class="empty-mini">아직 데이터가 없어요</div>';
+  return keys.map(k=>{ const m=srcMeta(k); const cnt=bySource[k]; const pct=total?Math.round(cnt/total*100):0;
+    return `<div class="source-row"><div class="sr-top"><span class="sr-name"><span class="sr-dot" style="background:${m.color}"></span>${esc(m.label)}</span><span class="sr-val"><b>${cnt}</b>건 · ${pct}%</span></div><div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${m.color}"></div></div></div>`;
+  }).join('');
+}
+function statusBars(byStatus, total){
+  byStatus = byStatus||{}; total=total||0;
+  const keys = STATUSES.map(s=>s.key).filter(k=>byStatus[k]);
+  if(!keys.length) return '<div class="empty-mini">아직 데이터가 없어요</div>';
+  return keys.map(k=>{ const m=statusMeta(k); const cnt=byStatus[k]; const pct=total?Math.round(cnt/total*100):0;
+    return `<div class="source-row"><div class="sr-top"><span class="sr-name"><span class="sr-dot" style="background:${m.color}"></span>${esc(k)}</span><span class="sr-val"><b>${cnt}</b>건 · ${pct}%</span></div><div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${m.color}"></div></div></div>`;
+  }).join('');
+}
+function deviceDonut(byDevice, total){
+  byDevice = byDevice||{}; total=total||0;
+  const mob = byDevice.mobile||0, desk = byDevice.desktop||0;
+  const known = mob+desk;
+  if(!known) return '<div class="empty-mini">아직 데이터가 없어요</div>';
+  const mobPct = Math.round(mob/known*100);
+  const deskPct = 100-mobPct;
+  const dash1 = (mobPct*1.0).toFixed(0);
+  return `<svg class="donut" viewBox="0 0 42 42"><circle cx="21" cy="21" r="15.9" fill="none" stroke="#E8E4DC" stroke-width="6"/><circle cx="21" cy="21" r="15.9" fill="none" stroke="#B8860B" stroke-width="6" stroke-dasharray="${dash1} 100" stroke-dashoffset="25" stroke-linecap="round"/><text x="21" y="20.5" text-anchor="middle" font-size="7" font-weight="800" fill="#0A0A0A">${mobPct}%</text><text x="21" y="26" text-anchor="middle" font-size="3.4" fill="#807A72">모바일</text></svg>
+  <div class="donut-legend"><div class="leg-row"><span class="d" style="background:#B8860B"></span><span class="ll">모바일</span><span class="lv">${mobPct}%</span></div><div class="leg-row"><span class="d" style="background:#E8E4DC"></span><span class="ll">데스크탑</span><span class="lv">${deskPct}%</span></div></div>`;
+}
+function emptyRow(cols){ return '<tr><td colspan="'+cols+'" style="text-align:center;color:#B5B0A8;padding:40px;">아직 상담 신청이 없어요</td></tr>'; }
+
+/* ===== INQUIRIES ===== */
+function renderInquiries(){
+  const s = DATA.stats||{};
+  const byStatus = s.byStatus||{};
+  const filters = [{key:'all',label:'전체',cnt:DATA.inquiries.length}]
+    .concat(STATUSES.filter(st=>byStatus[st.key]).map(st=>({key:st.key,label:st.key,cnt:byStatus[st.key]})));
+  $('filterBar').innerHTML = filters.map(f=>`<button class="filter-chip ${f.key===currentFilter?'active':''}" data-filter="${esc(f.key)}">${esc(f.label)}<span class="cnt">${f.cnt}</span></button>`).join('')
+    + `<div class="search-box"><svg viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="M21 21l-4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><input type="text" id="searchInput" placeholder="이름·지역 검색" value="${esc(searchQuery)}"></div>`;
+
+  let list = DATA.inquiries;
+  if(currentFilter!=='all') list = list.filter(q=>(q.status||'신규')===currentFilter);
+  if(searchQuery){ const qq=searchQuery.toLowerCase(); list = list.filter(q=> (q.name+q.phone+q.region+q.scope).toLowerCase().includes(qq)); }
+
+  $('inqBody').innerHTML = list.length ? list.map(q=>`
+    <tr data-row="${q.row}">
+      <td><div class="cust"><span class="nm">${esc(q.name)}</span><span class="ph">${esc(q.phone)}</span></div></td>
+      <td><div class="chips"><span class="chip">${esc(q.region||'-')}</span><span class="chip">${esc(q.area||'')}</span></div></td>
+      <td style="font-size:12.5px;color:var(--ink-2)">${esc(q.budget||'-')}</td>
+      <td>${srcTag(q.source)}</td>
+      <td>${statusBadge(q.status)}</td>
+      <td class="when">${relTime(q.submittedAt)}</td>
+    </tr>`).join('') : emptyRow(6);
+  bindRows('inqBody');
+
+  document.querySelectorAll('#filterBar .filter-chip').forEach(c=>c.addEventListener('click',()=>{ currentFilter=c.dataset.filter; renderInquiries(); }));
+  const si=$('searchInput'); if(si){ si.addEventListener('input',e=>{ searchQuery=e.target.value; const pos=si.selectionStart; renderInquiries(); const ns=$('searchInput'); if(ns){ns.focus(); ns.setSelectionRange(pos,pos);} }); }
+}
+
+/* ===== MARKETING ===== */
+function renderMarketing(){
+  const s = DATA.stats||{};
+  const bs = s.bySource||{};
+  const total = s.total||0;
+  const sourceCount = Object.keys(bs).length;
+  let topSrc='-',max=0; Object.keys(bs).forEach(k=>{if(bs[k]>max){max=bs[k];topSrc=k;}});
+  $('mktStatGrid').innerHTML = [
+    statCard('lime','M3 17l5-5 4 3 5-6 4 4', topSrc==='-'?'<span class="unit">없음</span>':srcMeta(topSrc).label,'최다 유입 경로'),
+    statCard('blue','M4 5h16M4 12h16M4 19h10', sourceCount+'<span class="unit">개</span>','유입 채널 수'),
+    statCard('green','M3 17l5-5 4 3 5-6 4 4', (total?Math.round((bs.instagram||0)/total*100):0)+'<span class="unit">%</span>','인스타 비중'),
+    statCard('amber','M12 7v5l3 2', ((s.byDevice&&s.byDevice.mobile)?Math.round(s.byDevice.mobile/total*100):0)+'<span class="unit">%</span>','모바일 접속 비중')
+  ].join('');
+  $('mktSourceList').innerHTML = sourceBars(bs, total);
+
+  $('mktBody').innerHTML = DATA.inquiries.length ? DATA.inquiries.map(q=>`
+    <tr data-row="${q.row}">
+      <td><div class="cust"><span class="nm">${esc(q.name)}</span><span class="ph">${esc(q.phone)}</span></div></td>
+      <td>${srcTag(q.source)}</td>
+      <td style="font-size:12.5px;color:var(--ink-3)">${esc(q.medium||'-')}${q.campaign?' · '+esc(q.campaign):''}</td>
+      <td style="font-size:12.5px">${q.device==='mobile'?'📱 모바일':q.device==='desktop'?'💻 데스크탑':'-'}</td>
+      <td class="when">${relTime(q.submittedAt)}</td>
+    </tr>`).join('') : emptyRow(5);
+  bindRows('mktBody');
+}
+
+/* ===== DETAIL DRAWER ===== */
+function bindRows(bodyId){
+  document.querySelectorAll('#'+bodyId+' tr[data-row]').forEach(tr=>{
+    tr.addEventListener('click',()=>openDrawer(Number(tr.dataset.row)));
+  });
+}
+function openDrawer(row){
+  const q = DATA.inquiries.find(x=>x.row===row);
+  if(!q) return;
+  const m = statusMeta(q.status);
+  const files = (q.files||'').split('\n').filter(Boolean);
+  $('drawer').innerHTML = `
+    <div class="drawer-head">
+      <div class="dh-top">
+        <div><div class="nm">${esc(q.name)}</div><div class="ph">${esc(q.phone)}</div></div>
+        <button class="close" id="drawerClose">✕</button>
+      </div>
+      <div class="meta-row">${srcTag(q.source)}${statusBadge(q.status)}<span class="when" style="align-self:center">${esc(q.submittedAt)}</span></div>
+      <a class="call-btn" href="tel:${esc(q.phone.replace(/[^0-9]/g,''))}"><svg viewBox="0 0 24 24" fill="none"><path d="M22 16.9v3a2 2 0 01-2.2 2 19.8 19.8 0 01-8.6-3.1 19.5 19.5 0 01-6-6A19.8 19.8 0 012.1 4.2 2 2 0 014.1 2h3a2 2 0 012 1.7c.1 1 .4 1.9.7 2.8a2 2 0 01-.5 2.1L8.1 9.9a16 16 0 006 6l1.3-1.3a2 2 0 012.1-.4c.9.3 1.8.6 2.8.7a2 2 0 011.7 2z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>바로 전화하기</a>
+    </div>
+    <div class="drawer-body">
+      <div class="d-field"><div class="k">연락 희망 시간</div><div class="v">${esc(q.contactTime||'-')}</div></div>
+      <div class="d-sep"></div>
+      <div class="d-grid">
+        <div class="d-field"><div class="k">시공 지역</div><div class="v">${esc(q.region||'-')}</div></div>
+        <div class="d-field"><div class="k">주거 형태</div><div class="v">${esc(q.houseType||'-')}</div></div>
+        <div class="d-field"><div class="k">전용 면적</div><div class="v">${esc(q.area||'-')}</div></div>
+        <div class="d-field"><div class="k">예산</div><div class="v">${esc(q.budget||'-')}</div></div>
+      </div>
+      <div class="d-field"><div class="k">시공 범위</div><div class="v">${esc(q.scope||'-')}</div></div>
+      <div class="d-field"><div class="k">희망 시기</div><div class="v">${esc(q.timing||'-')}</div></div>
+      ${q.notes?`<div class="d-field"><div class="k">요청 사항</div><div class="v pre">${nl2br(q.notes)}</div></div>`:''}
+      ${files.length?`<div class="d-field"><div class="k">첨부 이미지</div><div class="d-files">${files.map((u,i)=>`<a href="${esc(u)}" target="_blank">이미지 ${i+1} ↗</a>`).join('')}</div></div>`:''}
+      <div class="d-sep"></div>
+      <div class="d-field"><div class="k">유입 경로</div><div class="v">${srcMeta(q.source).label}${q.medium?' · '+esc(q.medium):''}${q.campaign?' · '+esc(q.campaign):''} · ${q.device==='mobile'?'모바일':q.device==='desktop'?'데스크탑':esc(q.device||'-')}</div></div>
+      <div class="d-sep"></div>
+      <div class="d-field"><div class="k">상태 변경</div>
+        <div class="status-select" id="statusSelect">${STATUSES.map(st=>`<button class="status-opt ${st.key===q.status?'sel':''}" data-status="${st.key}" style="${st.key===q.status?('background:'+st.color+';border-color:'+st.color):''}">${st.key}</button>`).join('')}</div>
+      </div>
+      <div class="d-field"><div class="k">메모</div><textarea class="memo-area" id="memoArea" placeholder="통화 내용, 다음 할 일 등">${esc(q.memo||'')}</textarea></div>
+      <button class="save-btn" id="saveBtn">변경사항 저장</button>
+    </div>`;
+  $('drawer').classList.add('show');
+  $('drawerOverlay').classList.add('show');
+
+  let selStatus = q.status;
+  $('drawerClose').addEventListener('click', closeDrawer);
+  document.querySelectorAll('#statusSelect .status-opt').forEach(b=>{
+    b.addEventListener('click',()=>{
+      selStatus=b.dataset.status;
+      document.querySelectorAll('#statusSelect .status-opt').forEach(x=>{x.classList.remove('sel');x.style.cssText='';});
+      const m2=statusMeta(selStatus); b.classList.add('sel'); b.style.cssText='background:'+m2.color+';border-color:'+m2.color;
+    });
+  });
+  $('saveBtn').addEventListener('click', async ()=>{
+    const btn=$('saveBtn'); btn.disabled=true; btn.textContent='저장 중…';
+    const memo = $('memoArea').value;
+    try {
+      const r = await apiPost({ action:'updateStatus', password:PASSWORD, row:q.row, status:selStatus, memo:memo });
+      if(!r.ok) throw new Error(r.error||'failed');
+      q.status=selStatus; q.memo=memo;
+      DATA.stats = recomputeStats();
+      renderAll();
+      closeDrawer();
+      toast('저장됐습니다');
+    } catch(err){ btn.disabled=false; btn.textContent='변경사항 저장'; toast('저장 실패: '+(err.message||err)); }
+  });
+}
+function closeDrawer(){ $('drawer').classList.remove('show'); $('drawerOverlay').classList.remove('show'); }
+
+function recomputeStats(){
+  const now=new Date(); const ym=now.toISOString().slice(0,7);
+  const s={total:DATA.inquiries.length,monthCount:0,newCount:0,bySource:{},byStatus:{},byDevice:{}};
+  DATA.inquiries.forEach(q=>{
+    if((q.submittedAt||'').slice(0,7)===ym) s.monthCount++;
+    if((q.status||'신규')==='신규') s.newCount++;
+    const sr=q.source||'direct'; s.bySource[sr]=(s.bySource[sr]||0)+1;
+    const st=q.status||'신규'; s.byStatus[st]=(s.byStatus[st]||0)+1;
+    const dv=q.device||'unknown'; s.byDevice[dv]=(s.byDevice[dv]||0)+1;
+  });
+  return s;
+}
+
+/* ====== PORTFOLIO MANAGEMENT ====== */
+const CATEGORIES = ['Apartment','Townhouse','Villa','Officetel'];
+const CAT_LABEL = { Apartment:'아파트', Townhouse:'타운하우스', Villa:'빌라', Officetel:'오피스텔' };
+let PF_ITEMS = [];
+
+async function loadPortfolio(){
+  const grid = $('portfolioGrid');
+  grid.innerHTML = '<div class="pf-empty"><div class="sp" style="width:28px;height:28px;border:3px solid var(--line);border-top-color:var(--gold);border-radius:50%;margin:0 auto 14px;animation:spin .8s linear infinite;"></div>불러오는 중…</div>';
+  try {
+    const r = await apiPost({ action:'portfolioList', password:PASSWORD });
+    if(!r.ok) throw new Error(r.error||'failed');
+    PF_ITEMS = r.items||[];
+    renderPortfolio();
+  } catch(err){
+    grid.innerHTML = '<div class="pf-empty">불러오지 못했어요: '+esc(String(err.message||err))+'</div>';
+  }
+}
+
+function renderPortfolio(){
+  const grid = $('portfolioGrid');
+  if(!PF_ITEMS.length){ grid.innerHTML = '<div class="pf-empty">아직 등록된 시공 사례가 없어요.<br>우측 상단 「새 시공 사례 추가」로 시작하세요.</div>'; return; }
+  grid.innerHTML = PF_ITEMS.map((it,i)=>{
+    const cover = it.images && it.images.length
+      ? (it.images.find(im=>/main/i.test(im.name))||it.images[0])
+      : null;
+    return `<div class="pf-card">
+      <div class="pf-cover">
+        ${cover?`<img src="${esc(cover.thumb)}" referrerpolicy="no-referrer" alt="">`:'<div class="ph">사진 없음</div>'}
+        <span class="order-badge">${i+1}</span>
+        <span class="cnt-badge">📷 ${it.imageCount}</span>
+      </div>
+      <div class="pf-body">
+        <div class="ttl">${esc(it.title||'(제목 없음)')}</div>
+        <div class="meta">${esc(CAT_LABEL[it.category]||it.category)}</div>
+        ${it.tag?`<span class="tag-chip">${esc(it.tag)}</span>`:''}
+        <div class="pf-actions">
+          <div class="pf-reorder">
+            <button data-up="${i}" ${i===0?'disabled style=opacity:.3':''}>↑</button>
+            <button data-down="${i}" ${i===PF_ITEMS.length-1?'disabled style=opacity:.3':''}>↓</button>
+          </div>
+          <button class="pf-btn" data-edit="${i}">관리</button>
+          <button class="pf-btn danger" data-del="${i}">삭제</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  grid.querySelectorAll('[data-edit]').forEach(b=>b.addEventListener('click',()=>openProjectModal(PF_ITEMS[Number(b.dataset.edit)])));
+  grid.querySelectorAll('[data-del]').forEach(b=>b.addEventListener('click',()=>deleteProject(PF_ITEMS[Number(b.dataset.del)])));
+  grid.querySelectorAll('[data-up]').forEach(b=>b.addEventListener('click',()=>moveProject(Number(b.dataset.up),-1)));
+  grid.querySelectorAll('[data-down]').forEach(b=>b.addEventListener('click',()=>moveProject(Number(b.dataset.down),1)));
+}
+
+async function moveProject(idx, dir){
+  const j = idx+dir;
+  if(j<0||j>=PF_ITEMS.length) return;
+  const a = PF_ITEMS[idx], b = PF_ITEMS[j];
+  PF_ITEMS[idx]=b; PF_ITEMS[j]=a;
+  renderPortfolio();
+  const orders = PF_ITEMS.map((it,i)=>({folderName:it.folderName, order:i+1}));
+  PF_ITEMS.forEach((it,i)=>it.order=i+1);
+  try { await apiPost({ action:'portfolioReorder', password:PASSWORD, orders:orders }); toast('순서 변경됨'); }
+  catch(e){ toast('순서 저장 실패'); }
+}
+
+async function deleteProject(it){
+  if(!confirm(`"${it.title||it.folderName}" 시공 사례를 삭제할까요?\n사진 폴더도 함께 휴지통으로 이동합니다.`)) return;
+  try {
+    const r = await apiPost({ action:'portfolioDelete', password:PASSWORD, sheetRow:it.sheetRow, folderName:it.folderName });
+    if(!r.ok) throw new Error(r.error);
+    toast('삭제됐습니다');
+    loadPortfolio();
+  } catch(e){ toast('삭제 실패: '+(e.message||e)); }
+}
+
+/* ===== Project modal (create/edit + upload) ===== */
+let pfCurrent = null;
+function openProjectModal(item){
+  pfCurrent = item || null;
+  const isNew = !item;
+  $('pfModal').innerHTML = `
+    <div class="modal-head">
+      <h2>${isNew?'새 시공 사례':'시공 사례 관리'}</h2>
+      <button class="close" id="pfClose">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="mf"><label>프로젝트명</label><input id="pfTitle" placeholder="예: 서초구 아파트 32평" value="${esc(item?item.title:'')}"></div>
+      <div class="mf-row">
+        <div class="mf"><label>분류</label><select id="pfCat">${CATEGORIES.map(c=>`<option value="${c}" ${item&&item.category===c?'selected':''}>${CAT_LABEL[c]}</option>`).join('')}</select></div>
+        <div class="mf"><label>태그 (짧게)</label><input id="pfTag" placeholder="예: 모던 화이트" value="${esc(item?item.tag:'')}"></div>
+      </div>
+      <div class="mf"><label>설명</label><textarea id="pfDesc" placeholder="시공 내용을 간단히 적어주세요">${esc(item?item.desc:'')}</textarea></div>
+
+      <div class="mf" id="uploadSection" style="${isNew?'opacity:.5;pointer-events:none':''}">
+        <label>사진 ${isNew?'<span style="color:var(--ink-3);font-weight:500">(저장 후 추가할 수 있어요)</span>':'<span style="color:var(--ink-3);font-weight:500">— ☆ 대표 지정 / ✕ 삭제</span>'}</label>
+        <div class="dropzone" id="dropzone">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M12 16V4m0 0L7 9m5-5l5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          <div class="dz-t">사진을 드래그하거나 클릭해서 선택</div>
+          <div class="dz-s">JPG, PNG · 한 번에 여러 장 가능 (10~20장 권장)</div>
+          <input type="file" id="fileInput" accept="image/*" multiple style="display:none">
+        </div>
+        <div class="upload-progress" id="uploadProgress"><span id="upText"></span><div class="pbar"><div class="pfill" id="upFill" style="width:0%"></div></div></div>
+        <div class="thumb-grid" id="thumbGrid"></div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="cancel" id="pfCancel">닫기</button>
+      <button class="save" id="pfSave">${isNew?'만들고 사진 추가':'정보 저장'}</button>
+    </div>`;
+  $('pfModal').classList.add('show');
+  $('pfModalOverlay').classList.add('show');
+
+  $('pfClose').addEventListener('click', closeProjectModal);
+  $('pfCancel').addEventListener('click', closeProjectModal);
+  $('pfSave').addEventListener('click', saveProject);
+
+  if(!isNew){ renderThumbs(); bindDropzone(); }
+}
+function closeProjectModal(){ $('pfModal').classList.remove('show'); $('pfModalOverlay').classList.remove('show'); loadPortfolio(); }
+
+function renderThumbs(){
+  if(!pfCurrent) return;
+  const grid = $('thumbGrid');
+  const imgs = pfCurrent.images||[];
+  grid.innerHTML = imgs.map(im=>{
+    const isMain = /main/i.test(im.name);
+    return `<div class="thumb-item ${isMain?'main':''}" data-id="${im.id}">
+      <img src="${esc(im.thumb)}" referrerpolicy="no-referrer" alt="">
+      <button class="star" data-star="${im.id}" title="대표 지정">${isMain?'★':'☆'}</button>
+      <button class="del" data-delimg="${im.id}" title="삭제">✕</button>
+      ${isMain?'<div class="main-label">대표</div>':''}
+    </div>`;
+  }).join('') || '<div style="grid-column:1/-1;color:var(--ink-4);font-size:12.5px;padding:10px 0;">아직 사진이 없어요. 위에서 추가하세요.</div>';
+
+  grid.querySelectorAll('[data-star]').forEach(b=>b.addEventListener('click',()=>setMain(b.dataset.star)));
+  grid.querySelectorAll('[data-delimg]').forEach(b=>b.addEventListener('click',()=>delImage(b.dataset.delimg)));
+}
+
+async function setMain(fileId){
+  if(!pfCurrent) return;
+  try {
+    await apiPost({ action:'portfolioSetMain', password:PASSWORD, folderId:pfCurrent.folderId, fileId:fileId });
+    pfCurrent.images.forEach(im=>{ im.name = im.name.replace(/^00_main_/i,'').replace(/(^|_)main_/i,'$1'); });
+    const t = pfCurrent.images.find(im=>im.id===fileId); if(t && !/main/i.test(t.name)) t.name='00_main_'+t.name;
+    renderThumbs(); toast('대표 사진 지정됨');
+  } catch(e){ toast('실패: '+(e.message||e)); }
+}
+async function delImage(fileId){
+  if(!pfCurrent) return;
+  if(!confirm('이 사진을 삭제할까요?')) return;
+  try {
+    await apiPost({ action:'portfolioDeleteImage', password:PASSWORD, fileId:fileId });
+    pfCurrent.images = pfCurrent.images.filter(im=>im.id!==fileId);
+    pfCurrent.imageCount = pfCurrent.images.length;
+    renderThumbs(); toast('사진 삭제됨');
+  } catch(e){ toast('실패: '+(e.message||e)); }
+}
+
+function bindDropzone(){
+  const dz = $('dropzone'), fi = $('fileInput');
+  if(!dz) return;
+  dz.addEventListener('click',()=>fi.click());
+  fi.addEventListener('change',e=>{ if(e.target.files.length) uploadFiles(Array.from(e.target.files)); fi.value=''; });
+  ['dragover','dragenter'].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();dz.classList.add('drag');}));
+  ['dragleave','drop'].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();dz.classList.remove('drag');}));
+  dz.addEventListener('drop',e=>{ const fs=Array.from(e.dataTransfer.files).filter(f=>f.type.startsWith('image/')); if(fs.length) uploadFiles(fs); });
+}
+
+function fileToB64(file){
+  return new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res({name:file.name,type:file.type||'image/jpeg',data:r.result.split(',')[1]}); r.onerror=rej; r.readAsDataURL(file); });
+}
+
+async function uploadFiles(files){
+  if(!pfCurrent){ toast('먼저 프로젝트를 저장하세요'); return; }
+  const prog = $('uploadProgress'), fill = $('upFill'), txt = $('upText');
+  prog.classList.add('show');
+  let done=0;
+  for(const file of files){
+    txt.textContent = `업로드 중… ${done+1} / ${files.length} (${file.name})`;
+    try {
+      const b64 = await fileToB64(file);
+      const r = await apiPost({ action:'portfolioUpload', password:PASSWORD, folderId:pfCurrent.folderId, file:b64 });
+      if(r.ok){ pfCurrent.images.push({ id:r.id, name:r.name, thumb:r.thumb }); pfCurrent.imageCount=pfCurrent.images.length; renderThumbs(); }
+    } catch(e){}
+    done++;
+    fill.style.width = Math.round(done/files.length*100)+'%';
+  }
+  txt.textContent = `${done}장 업로드 완료 ✓`;
+  setTimeout(()=>prog.classList.remove('show'), 1800);
+  if(pfCurrent.images.length && !pfCurrent.images.some(im=>/main/i.test(im.name))){
+    setMain(pfCurrent.images[0].id);
+  }
+}
+
+async function saveProject(){
+  const btn=$('pfSave'); btn.disabled=true;
+  const title=$('pfTitle').value.trim();
+  const category=$('pfCat').value;
+  const tag=$('pfTag').value.trim();
+  const desc=$('pfDesc').value.trim();
+  if(!title){ toast('프로젝트명을 입력하세요'); btn.disabled=false; return; }
+  try {
+    if(!pfCurrent){
+      const r = await apiPost({ action:'portfolioCreate', password:PASSWORD, title, category, tag, desc });
+      if(!r.ok) throw new Error(r.error);
+      pfCurrent = { sheetRow:r.sheetRow, folderName:r.folderName, folderId:r.folderId, order:r.order, title, category, tag, desc, images:[], imageCount:0 };
+      toast('생성됨! 이제 사진을 추가하세요');
+      openProjectModal(pfCurrent);
+    } else {
+      const r = await apiPost({ action:'portfolioUpdate', password:PASSWORD, sheetRow:pfCurrent.sheetRow, title, category, tag, desc });
+      if(!r.ok) throw new Error(r.error);
+      pfCurrent.title=title; pfCurrent.category=category; pfCurrent.tag=tag; pfCurrent.desc=desc;
+      toast('저장됐습니다'); btn.disabled=false;
+    }
+  } catch(e){ toast('저장 실패: '+(e.message||e)); btn.disabled=false; }
+}
+
+document.addEventListener('DOMContentLoaded',()=>{});
+$('addProjectBtn').addEventListener('click',()=>openProjectModal(null));
+$('pfModalOverlay').addEventListener('click',closeProjectModal);
+
+
+/* ====== VIEW SWITCH ====== */
+let activeView='dashboard';
+const VIEW_META = {
+  dashboard:{title:'대시보드',sub:'마케팅 유입과 상담 신청을 한눈에'},
+  inquiries:{title:'상담 신청',sub:'신청 내역 관리 및 상태 변경'},
+  marketing:{title:'마케팅 분석',sub:'유입 경로별 성과 분석'},
+  portfolio:{title:'포트폴리오',sub:'랜딩페이지 시공 사례 관리'}
+};
+function showView(v){
+  activeView=v;
+  document.querySelectorAll('.view').forEach(el=>el.classList.remove('show'));
+  $('view-'+v).classList.add('show');
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('active',n.dataset.view===v));
+  $('viewTitle').textContent=VIEW_META[v].title;
+  $('viewSub').textContent=VIEW_META[v].sub;
+  if(v==='portfolio') loadPortfolio();
+}
+document.querySelectorAll('.nav-item').forEach(n=>n.addEventListener('click',()=>showView(n.dataset.view)));
+document.addEventListener('click',e=>{ const g=e.target.closest('[data-goto]'); if(g) showView(g.dataset.goto); });
+$('drawerOverlay').addEventListener('click',closeDrawer);
+$('refreshBtn').addEventListener('click',()=>{ $('refreshBtn').classList.add('spin'); loadData().finally(()=>$('refreshBtn').classList.remove('spin')); });
+
+/* ====== LOGIN ====== */
+async function tryLogin(pw){
+  const r = await apiPost({ action:'getAdmin', password: pw });
+  return r.ok;
+}
+$('loginBtn').addEventListener('click', doLogin);
+$('pw').addEventListener('keydown',e=>{ if(e.key==='Enter') doLogin(); });
+async function doLogin(){
+  const pw=$('pw').value.trim();
+  if(!pw){ $('loginErr').textContent='비밀번호를 입력해주세요.'; return; }
+  const btn=$('loginBtn'); btn.disabled=true; btn.textContent='확인 중…'; $('loginErr').textContent='';
+  try {
+    const ok = await tryLogin(pw);
+    if(!ok){ $('loginErr').textContent='비밀번호가 올바르지 않습니다.'; btn.disabled=false; btn.textContent='로그인'; return; }
+    PASSWORD=pw; sessionStorage.setItem('sb_admin_pw',pw);
+    $('loginScreen').style.display='none';
+    $('app').classList.add('show');
+    loadData();
+  } catch(err){ $('loginErr').textContent='연결 오류. 잠시 후 다시 시도해주세요.'; btn.disabled=false; btn.textContent='로그인'; }
+}
+$('logoutBtn').addEventListener('click',()=>{ sessionStorage.removeItem('sb_admin_pw'); location.reload(); });
+
+/* auto-login if password cached */
+(async function(){
+  if(PASSWORD){
+    $('loginScreen').style.display='none';
+    $('app').classList.add('show');
+    loadData();
+  }
+})();
+</script>
+</body>
+</html>
