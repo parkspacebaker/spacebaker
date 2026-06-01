@@ -1,0 +1,1972 @@
+<!DOCTYPE html><html lang="ko"><head>
+
+
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>SPACE BAKER · 스페이스베이커</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;800;900&amp;display=swap">
+<style>
+  @font-face {
+    font-family: "Quanty";
+    src: url("fonts/Quanty.ttf") format("truetype");
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;
+  }
+  :root {
+    --bg: #FFFFFF;
+    --bg-soft: #F6F4F0;
+    --bg-beige: #F5F0EB;
+    --ink: #0A0A0A;
+    --ink-2: #2B2B2B;
+    --ink-3: #6E6E6E;
+    --ink-4: #B5B0A8;
+    --line: #E8E4DC;
+    --line-2: #EFEBE3;
+    --gold: rgb(225, 248, 0);
+    --gold-deep: rgb(190, 215, 0);
+    --gold-soft: rgb(225, 248, 0);
+    --radius: 18px;
+    --radius-lg: 24px;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: "Noto Sans KR", system-ui, -apple-system, "Helvetica Neue", sans-serif;
+    color: var(--ink);
+    background: #1a1815;
+    font-weight: 400;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    letter-spacing: -0.01em;
+  }
+
+  /* Mobile shell */
+  .shell {
+    max-width: 430px;
+    margin: 0 auto;
+    background: var(--bg);
+    min-height: 100vh;
+    position: relative;
+    box-shadow: 0 0 80px rgba(0,0,0,0.35);
+    overflow: hidden;
+  }
+  @media (max-width: 460px) {
+    body { background: var(--bg); }
+    .shell { box-shadow: none; max-width: 100%; }
+  }
+
+  /* ========== TOP NAV ========== */
+  .topbar {
+    position: relative;
+    background: var(--bg);
+    border-bottom: 1px solid var(--line);
+    z-index: 5;
+  }
+  .topbar .row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 20px 14px;
+  }
+  .topbar .wm {
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+  }
+  .topbar .wm sup {
+    font-size: 9px;
+    font-weight: 500;
+    vertical-align: super;
+    margin-left: 2px;
+    color: var(--ink-3);
+  }
+  .topbar .menu-ico {
+    width: 22px; height: 22px;
+    display: inline-flex; flex-direction: column; justify-content: center; gap: 5px;
+  }
+  .topbar .menu-ico span {
+    height: 1.5px; background: var(--ink); border-radius: 1px; display: block;
+  }
+  .topbar .menu-ico span:nth-child(1) { width: 22px; }
+  .topbar .menu-ico span:nth-child(2) { width: 14px; margin-left: auto; }
+  .nav {
+    display: flex; gap: 28px;
+    padding: 10px 20px 16px;
+    border-top: 1px solid var(--line-2);
+  }
+  .nav a {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--ink-3);
+    text-decoration: none;
+    padding-bottom: 4px;
+    letter-spacing: -0.005em;
+    transition: color 0.15s ease;
+  }
+  .nav a.active {
+    color: var(--ink);
+    font-weight: 700;
+    border-bottom: 1.5px solid var(--ink);
+  }
+  .nav a:hover { color: var(--ink); }
+
+  /* ========== HERO ========== */
+  .hero {
+    position: relative;
+    height: 100vh;
+    min-height: 680px;
+    max-height: 880px;
+    overflow: hidden;
+    background: #1a1815;
+  }
+  /* wordmark over hero (top-left) */
+  .hero-wm {
+    position: absolute;
+    top: 22px; left: 20px;
+    z-index: 3;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--gold-soft);
+    letter-spacing: -0.01em;
+  }
+  .hero-wm sup {
+    font-size: 8px;
+    font-weight: 500;
+    vertical-align: super;
+    margin-left: 2px;
+    color: rgba(233,217,176,0.7);
+  }
+
+  .hero-bg {
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(80% 60% at 50% 40%, rgba(225,248,0,0.10), transparent 70%),
+      radial-gradient(120% 80% at 100% 0%, rgba(0,0,0,0.5), transparent 60%),
+      linear-gradient(180deg, #2a2520 0%, #1a1612 100%);
+  }
+  /* subtle striped placeholder texture */
+  .hero-bg::before {
+    content: "";
+    position: absolute; inset: 0;
+    background-image: linear-gradient(135deg,
+      rgba(255,255,255,0.018) 0,
+      rgba(255,255,255,0.018) 1px,
+      transparent 1px,
+      transparent 22px);
+    opacity: 0.6;
+  }
+  .hero-bg::after {
+    content: "INTERIOR  PHOTO  PLACEHOLDER";
+    position: absolute;
+    bottom: 14px; right: 16px;
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 9px;
+    letter-spacing: 0.18em;
+    color: rgba(255,255,255,0.18);
+  }
+  /* darkening overlay so text stays readable */
+  .hero-video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    z-index: 1;
+    pointer-events: none;
+    background: transparent;
+  }
+  .hero-overlay {
+    position: absolute; inset: 0;
+    z-index: 2;
+    background: linear-gradient(180deg,
+      rgba(0,0,0,0.55) 0%,
+      rgba(0,0,0,0.40) 30%,
+      rgba(0,0,0,0.45) 50%,
+      rgba(0,0,0,0.80) 100%);
+  }
+  .hero-title {
+    position: absolute;
+    z-index: 3;
+    top: 28%;
+    left: 0; right: 0;
+    text-align: center;
+    transform: translateY(-50%);
+    padding: 0 20px;
+    color: var(--gold-soft);
+  }
+  .hero-title h1 {
+    font-size: 38px;
+    line-height: 1.05;
+    font-weight: 800;
+    margin: 0;
+    letter-spacing: -0.025em;
+    color: var(--gold-soft);
+    text-shadow: 0 2px 20px rgba(0,0,0,0.3);
+  }
+  .hero-title .sub {
+    margin-top: -10px;
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.015em;
+    color: var(--gold-soft);
+  }
+  .hero-bottom {
+    position: absolute;
+    z-index: 3;
+    bottom: 96px;
+    left: 0; right: 0;
+    padding: 0 28px;
+    text-align: center;
+    color: #fff;
+  }
+  .hero-bottom .label {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--gold-soft);
+    margin: 0 0 30px;
+    letter-spacing: -0.005em;
+  }
+  .hero-bottom .body {
+    font-size: 14px;
+    line-height: 1.7;
+    color: rgba(255,255,255,0.92);
+    margin: 0 0 24px;
+    font-weight: 400;
+  }
+  .pill-cta {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--gold);
+    color: #0A0A0A;
+    padding: 13px 22px;
+    border-radius: 999px;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: -0.005em;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    transition: transform 0.18s ease, background 0.18s ease, box-shadow 0.18s ease;
+    box-shadow: 0 8px 24px -8px rgba(225,248,0,0.6);
+  }
+  .pill-cta:hover {
+    background: rgb(208, 230, 0);
+    transform: translateY(-1px);
+    box-shadow: 0 12px 28px -8px rgba(225,248,0,0.7);
+  }
+  .pill-cta:active { transform: translateY(0); }
+  .pill-cta .arrow {
+    display: inline-block; width: 14px; height: 14px;
+    background: #0A0A0A;
+    border-radius: 50%;
+    position: relative;
+  }
+  .pill-cta .arrow::before {
+    content: "";
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 5px; height: 5px;
+    border-right: 1.4px solid var(--gold);
+    border-top: 1.4px solid var(--gold);
+    transform: translate(-65%, -50%) rotate(45deg);
+  }
+
+  /* ========== EDITORIAL SECTION BASE ========== */
+  section.ed {
+    padding: 72px 20px;
+    background: var(--bg);
+  }
+  .ed .label {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--ink);
+    margin: 0 0 14px 0;
+    letter-spacing: -0.005em;
+  }
+  .ed h2 {
+    font-size: 32px;
+    line-height: 1.15;
+    font-weight: 800;
+    margin: 0 0 18px 0;
+    letter-spacing: -0.028em;
+    color: var(--ink);
+  }
+  .ed .body {
+    font-size: 14.5px;
+    line-height: 1.7;
+    color: var(--ink-2);
+    margin: 0;
+  }
+
+  /* ========== STATS ========== */
+  .stats {
+    padding: 56px 20px;
+    background: var(--bg-soft);
+  }
+  .stats .label {
+    font-size: 13px;
+    font-weight: 700;
+    margin: 0 0 20px 0;
+    color: var(--ink);
+  }
+  .stat-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0;
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+  }
+  .stat-cell {
+    padding: 22px 8px;
+    text-align: left;
+    position: relative;
+  }
+  .stat-cell + .stat-cell::before {
+    content: "";
+    position: absolute;
+    left: 0; top: 18px; bottom: 18px;
+    width: 1px;
+    background: var(--line);
+  }
+  .stat-num {
+    font-size: 36px;
+    font-weight: 800;
+    line-height: 1;
+    color: var(--ink);
+    letter-spacing: -0.03em;
+  }
+  .stat-num .accent { color: var(--gold); }
+  .stat-num .unit {
+    font-size: 18px;
+    font-weight: 700;
+    margin-left: 1px;
+    color: var(--gold);
+  }
+  .stat-label {
+    margin-top: 8px;
+    font-size: 12px;
+    color: var(--ink-3);
+    font-weight: 500;
+  }
+
+  /* ========== PORTFOLIO ========== */
+  .portfolio { padding: 80px 20px 24px; }
+  .portfolio h2 { margin-bottom: 36px; }
+  .proj { margin-bottom: 56px; }
+  .proj-img {
+    position: relative;
+    aspect-ratio: 4 / 3;
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: var(--bg-beige);
+    margin-bottom: 18px;
+  }
+  .proj-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: opacity 0.35s ease;
+  }
+  .proj-img img.loading {
+    opacity: 0;
+  }
+  .proj-img .ph {
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(135deg,
+        rgba(225,248,0,0.06) 0,
+        rgba(225,248,0,0.06) 1px,
+        transparent 1px,
+        transparent 18px);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .proj-img .ph-label {
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 10px;
+    color: rgba(10,10,10,0.32);
+    letter-spacing: 0.16em;
+    background: rgba(255,255,255,0.85);
+    padding: 6px 12px;
+    border-radius: 999px;
+    border: 1px solid rgba(0,0,0,0.04);
+  }
+  .proj-img .num {
+    position: absolute;
+    top: 16px; left: 16px;
+    background: rgba(10,10,10,0.85);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    padding: 6px 10px;
+    border-radius: 999px;
+    backdrop-filter: blur(8px);
+  }
+  .proj-img .tag {
+    position: absolute;
+    bottom: 16px; right: 16px;
+    background: var(--gold);
+    color: #0A0A0A;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 6px 12px;
+    border-radius: 999px;
+    letter-spacing: -0.005em;
+  }
+  /* multi-image indicator (top-right) */
+  .proj-img .count {
+    position: absolute;
+    top: 16px; right: 16px;
+    background: rgba(10,10,10,0.78);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 5px 10px 5px 8px;
+    border-radius: 999px;
+    backdrop-filter: blur(8px);
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    letter-spacing: -0.005em;
+  }
+  .proj-img .count svg { width: 12px; height: 12px; }
+  .proj { cursor: pointer; }
+  .proj .proj-img { transition: transform 0.3s ease; }
+  .proj:hover .proj-img { transform: translateY(-2px); }
+  .proj:active .proj-img { transform: translateY(0); }
+
+  /* ========== LIGHTBOX (full-screen gallery) ========== */
+  .lb {
+    position: fixed; inset: 0;
+    background: rgba(10, 8, 6, 0.96);
+    z-index: 100;
+    display: none;
+    flex-direction: column;
+    backdrop-filter: blur(2px);
+  }
+  .lb.open { display: flex; animation: lbFadeIn 0.22s ease; }
+  @keyframes lbFadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+  .lb-head {
+    flex-shrink: 0;
+    padding: 18px 20px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: #fff;
+  }
+  .lb-head .lb-title {
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: -0.015em;
+    line-height: 1.2;
+    max-width: 70%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .lb-head .lb-counter {
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 12px;
+    color: rgba(255,255,255,0.5);
+    letter-spacing: 0.06em;
+  }
+  .lb-head .lb-counter b { color: var(--gold); font-weight: 700; }
+  .lb-close {
+    position: absolute;
+    top: 14px; right: 14px;
+    width: 38px; height: 38px;
+    background: rgba(255,255,255,0.08);
+    border: none;
+    border-radius: 50%;
+    color: #fff;
+    font-size: 18px;
+    cursor: pointer;
+    z-index: 4;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.15s ease;
+  }
+  .lb-close:hover { background: rgba(255,255,255,0.18); }
+
+  .lb-stage {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 0;
+  }
+  .lb-track {
+    display: flex;
+    height: 100%;
+    width: 100%;
+    transition: transform 0.32s cubic-bezier(.22,.61,.36,1);
+    will-change: transform;
+  }
+  .lb-slide {
+    flex-shrink: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 16px;
+  }
+  .lb-slide img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    user-select: none;
+    -webkit-user-drag: none;
+  }
+  .lb-slide.loading::before {
+    content: "";
+    position: absolute;
+    width: 28px; height: 28px;
+    border: 2px solid rgba(255,255,255,0.18);
+    border-top-color: var(--gold);
+    border-radius: 50%;
+    animation: lbSpin 0.8s linear infinite;
+  }
+  @keyframes lbSpin { to { transform: rotate(360deg); } }
+
+  .lb-nav {
+    position: absolute;
+    top: 50%;
+    width: 40px; height: 40px;
+    margin-top: -20px;
+    background: rgba(255,255,255,0.08);
+    border: none;
+    border-radius: 50%;
+    color: #fff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s ease, transform 0.15s ease;
+    z-index: 3;
+  }
+  .lb-nav:hover { background: rgba(255,255,255,0.18); }
+  .lb-nav:active { transform: scale(0.94); }
+  .lb-nav.prev { left: 12px; }
+  .lb-nav.next { right: 12px; }
+  .lb-nav:disabled { opacity: 0.3; cursor: default; }
+  .lb-nav svg { width: 14px; height: 14px; }
+
+  /* thumbnail strip */
+  .lb-thumbs {
+    flex-shrink: 0;
+    padding: 12px 0 22px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .lb-thumbs::-webkit-scrollbar { display: none; }
+  .lb-thumbs-inner {
+    display: flex;
+    gap: 6px;
+    padding: 0 18px;
+    width: max-content;
+  }
+  .lb-thumb {
+    flex-shrink: 0;
+    width: 48px; height: 48px;
+    border-radius: 6px;
+    overflow: hidden;
+    border: 2px solid transparent;
+    background: rgba(255,255,255,0.06);
+    cursor: pointer;
+    padding: 0;
+    transition: border 0.15s ease, opacity 0.15s ease;
+    opacity: 0.5;
+  }
+  .lb-thumb img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .lb-thumb.active {
+    border-color: var(--gold);
+    opacity: 1;
+  }
+  .lb-thumb:hover { opacity: 1; }
+  body.lb-open { overflow: hidden; }
+  .proj-tag {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--ink-3);
+    margin: 0 0 6px 0;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .proj-title {
+    font-size: 22px;
+    font-weight: 800;
+    line-height: 1.25;
+    margin: 0 0 8px 0;
+    letter-spacing: -0.025em;
+    color: var(--ink);
+  }
+  .proj-desc {
+    font-size: 13.5px;
+    color: var(--ink-3);
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  /* ========== PROCESS ========== */
+  .process {
+    background: var(--ink);
+    color: #fff;
+    padding: 80px 20px;
+  }
+  .process .label { color: var(--gold-soft); }
+  .process h2 { color: #fff; }
+  .process .body { color: rgba(255,255,255,0.7); margin-bottom: 36px; }
+  .step-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .step-list li {
+    display: flex;
+    gap: 18px;
+    padding: 22px 0;
+    border-top: 1px solid rgba(255,255,255,0.1);
+  }
+  .step-list li:last-child { border-bottom: 1px solid rgba(255,255,255,0.1); }
+  .step-list .n {
+    flex-shrink: 0;
+    width: 38px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--gold-soft);
+    padding-top: 4px;
+    letter-spacing: 0.04em;
+  }
+  .step-list .t {
+    font-size: 17px;
+    font-weight: 700;
+    color: #fff;
+    margin: 0 0 4px 0;
+    letter-spacing: -0.015em;
+  }
+  .step-list .d {
+    font-size: 13.5px;
+    color: rgba(255,255,255,0.65);
+    margin: 0;
+    line-height: 1.6;
+  }
+  .step-list li {
+    align-items: flex-start;
+  }
+
+  /* ========== SURVEY (multi-step form) ========== */
+  .survey { padding: 80px 20px; background: var(--bg); }
+
+  .survey-card {
+    background: #fff;
+    border-radius: var(--radius);
+    border: 1px solid var(--line);
+    margin-top: 22px;
+    overflow: hidden;
+    position: relative;
+  }
+  .survey-card::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--gold);
+  }
+
+  /* progress */
+  .progress {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 22px 22px 0;
+  }
+  .progress .bar {
+    flex: 1;
+    height: 4px;
+    border-radius: 999px;
+    background: var(--line);
+    overflow: hidden;
+  }
+  .progress .bar.done {
+    background: var(--gold);
+  }
+  .progress .bar.current {
+    background: linear-gradient(90deg, var(--gold) 50%, var(--line) 50%);
+  }
+  .progress-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 18px 22px 6px;
+  }
+  .progress-meta .step-idx {
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    color: var(--ink-3);
+  }
+  .progress-meta .step-idx b {
+    color: var(--ink);
+    font-weight: 700;
+  }
+  .progress-meta .step-name {
+    font-size: 12px;
+    color: var(--ink-3);
+    font-weight: 500;
+  }
+
+  /* step content */
+  .step-pane {
+    display: none;
+    padding: 12px 22px 24px;
+  }
+  .step-pane.active {
+    display: block;
+    animation: fadeStep 0.28s ease;
+  }
+  @keyframes fadeStep {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .step-pane h3 {
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -0.022em;
+    margin: 8px 0 6px;
+    color: var(--ink);
+    line-height: 1.25;
+  }
+  .step-pane .sub {
+    font-size: 13px;
+    color: var(--ink-3);
+    margin: 0 0 22px;
+  }
+
+  /* form fields */
+  .field { margin-bottom: 22px; }
+  .field-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 10px;
+    letter-spacing: -0.005em;
+  }
+  .field-label .req {
+    color: var(--gold-deep);
+    font-size: 10px;
+    background: rgba(225,248,0,0.5);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+  }
+  .field-label .opt {
+    color: var(--ink-3);
+    font-size: 11px;
+    background: var(--line-2);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: 600;
+  }
+  .text-input,
+  .textarea-input {
+    width: 100%;
+    padding: 14px 14px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    font-size: 15px;
+    font-family: inherit;
+    color: var(--ink);
+    background: #fff;
+    transition: border 0.15s ease, box-shadow 0.15s ease;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  .text-input:focus,
+  .textarea-input:focus {
+    outline: none;
+    border-color: var(--ink);
+    box-shadow: 0 0 0 3px rgba(225,248,0,0.25);
+  }
+  .text-input::placeholder,
+  .textarea-input::placeholder { color: var(--ink-4); }
+  .textarea-input {
+    min-height: 110px;
+    resize: vertical;
+    line-height: 1.55;
+  }
+  .field-error {
+    margin-top: 6px;
+    font-size: 12px;
+    color: #d34;
+    display: none;
+  }
+  .field.has-error .text-input,
+  .field.has-error .textarea-input { border-color: #d34; }
+  .field.has-error .field-error { display: block; }
+  .field.has-error .opt-grid { box-shadow: 0 0 0 2px rgba(221,51,68,0.18); border-radius: 12px; }
+
+  /* option grid (cards) */
+  .opt-grid {
+    display: grid;
+    gap: 8px;
+  }
+  .opt-grid.cols-2 { grid-template-columns: 1fr 1fr; }
+  .opt-grid.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+  .opt-btn {
+    border: 1px solid var(--line);
+    background: #fff;
+    padding: 13px 12px;
+    border-radius: 10px;
+    font-size: 13.5px;
+    font-weight: 500;
+    font-family: inherit;
+    color: var(--ink-2);
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.15s ease;
+    line-height: 1.35;
+    letter-spacing: -0.005em;
+    min-height: 48px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+  }
+  .opt-btn .ico { font-size: 16px; line-height: 1; }
+  .opt-btn:hover {
+    border-color: var(--ink-4);
+    background: var(--bg-soft);
+  }
+  .opt-btn.selected {
+    border-color: var(--ink);
+    background: rgba(225,248,0,0.18);
+    color: var(--ink);
+    font-weight: 700;
+    box-shadow: inset 0 0 0 1px var(--ink);
+  }
+  .opt-btn.selected .ico { filter: none; }
+
+  /* file input */
+  .file-drop {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 14px 16px;
+    cursor: pointer;
+    background: #fff;
+    transition: border 0.15s ease, background 0.15s ease;
+  }
+  .file-drop:hover { border-color: var(--ink); background: var(--bg-soft); }
+  .file-drop input[type="file"] { display: none; }
+  .file-drop .fd-ico {
+    flex-shrink: 0;
+    width: 38px; height: 38px;
+    border-radius: 10px;
+    background: var(--bg-soft);
+    color: var(--ink-2);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+  .file-drop .fd-ico svg { width: 18px; height: 18px; }
+  .file-drop .fd-body { flex: 1; min-width: 0; }
+  .file-drop .fd-title {
+    font-size: 14px;
+    color: var(--ink);
+    font-weight: 600;
+    line-height: 1.3;
+    letter-spacing: -0.005em;
+  }
+  .file-drop .fd-hint {
+    font-size: 11.5px;
+    color: var(--ink-3);
+    margin-top: 2px;
+    line-height: 1.3;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .file-drop .fd-action {
+    flex-shrink: 0;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--ink-3);
+    padding: 6px 12px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    transition: color 0.15s ease, border 0.15s ease, background 0.15s ease;
+  }
+  .file-drop:hover .fd-action { color: var(--ink); border-color: var(--ink); }
+  .file-drop.has-file {
+    border-color: var(--ink);
+    background: rgba(225,248,0,0.10);
+  }
+  .file-drop.has-file .fd-ico { background: var(--gold); color: var(--ink); }
+  .file-drop.has-file .fd-action { color: var(--ink); border-color: var(--ink); background: #fff; }
+
+  /* nav row */
+  .nav-row {
+    display: flex;
+    gap: 8px;
+    padding: 18px 22px 22px;
+    border-top: 1px solid var(--line-2);
+    background: var(--bg-soft);
+  }
+  .btn {
+    flex: 1;
+    padding: 15px 18px;
+    border-radius: 999px;
+    font-size: 14px;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    border: none;
+    transition: transform 0.15s ease, background 0.15s ease, color 0.15s ease;
+    letter-spacing: -0.005em;
+    min-height: 48px;
+  }
+  .btn-prev {
+    background: transparent;
+    color: var(--ink-3);
+    border: 1px solid var(--line);
+    max-width: 110px;
+  }
+  .btn-prev:hover { color: var(--ink); border-color: var(--ink-3); }
+  .btn-next {
+    background: var(--ink);
+    color: #fff;
+  }
+  .btn-next:hover { background: #000; transform: translateY(-1px); }
+  .btn-submit {
+    background: var(--gold);
+    color: var(--ink);
+  }
+  .btn-submit:hover { background: rgb(208, 230, 0); transform: translateY(-1px); }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+  /* success */
+  .success-pane {
+    display: none;
+    padding: 56px 28px 56px;
+    text-align: center;
+  }
+  .success-pane.active { display: block; animation: fadeStep 0.4s ease; }
+  .success-check {
+    width: 64px; height: 64px;
+    border-radius: 50%;
+    background: var(--gold);
+    color: var(--ink);
+    margin: 0 auto 22px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 30px;
+    font-weight: 700;
+  }
+  .success-pane h3 {
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    margin: 0 0 8px;
+    color: var(--ink);
+  }
+  .success-pane p {
+    font-size: 14px;
+    color: var(--ink-3);
+    line-height: 1.7;
+    margin: 0 0 24px;
+  }
+  .success-meta {
+    border-top: 1px solid var(--line);
+    padding-top: 22px;
+    margin-top: 12px;
+  }
+  .success-meta .l {
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    color: var(--ink-3);
+    margin: 0 0 6px;
+    font-family: ui-monospace, monospace;
+  }
+  .success-meta .v {
+    font-size: 14px;
+    color: var(--ink);
+    font-weight: 700;
+  }
+
+  /* ========== FOOTER ========== */
+  .footer {
+    background: var(--bg);
+    border-top: 1px solid var(--line);
+    padding: 56px 20px 48px;
+  }
+  .footer .fm {
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    margin: 0 0 4px 0;
+  }
+  .footer .fm sup {
+    font-size: 10px;
+    font-weight: 500;
+    vertical-align: super;
+    color: var(--ink-3);
+    margin-left: 2px;
+  }
+  .footer .tag {
+    font-size: 13px;
+    color: var(--ink-3);
+    margin: 0 0 28px 0;
+    line-height: 1.6;
+  }
+  .contact {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    border-top: 1px solid var(--line);
+  }
+  .contact a {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 18px 0;
+    text-decoration: none;
+    color: var(--ink);
+    border-bottom: 1px solid var(--line);
+    transition: color 0.15s ease;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .contact a:hover { color: var(--gold); }
+  .contact a .ar {
+    font-size: 16px;
+    color: var(--ink-3);
+    transition: transform 0.15s ease, color 0.15s ease;
+  }
+  .contact a:hover .ar { transform: translateX(2px); color: var(--gold); }
+  .copyright {
+    margin-top: 40px;
+    font-size: 11px;
+    color: var(--ink-4);
+    letter-spacing: 0.04em;
+    text-align: left;
+  }
+</style>
+</head>
+<body style="">
+  <main class="shell" data-screen-label="Landing">
+
+    <!-- ========== 1. HERO ========== -->
+    <section class="hero" data-screen-label="01 Hero">
+      <div class="hero-bg"></div>
+      <video class="hero-video" src="hero.mp4" autoplay muted loop playsinline preload="auto"></video>
+      <div class="hero-overlay"></div>
+      <div class="hero-title" style="font-weight: 600">
+                <h1 style="letter-spacing: -0.95px; line-height: 1.8; font-weight: 700; font-family: &#39;Quanty&#39;, &#39;Noto Sans KR&#39;, sans-serif; text-transform: none; font-size: 45px">space baker<div style="font-size: 25px; font-weight: 100; font-family: &#39;Quanty&#39;, &#39;Noto Sans KR&#39;, sans-serif">
+</div></h1>
+        <div class="sub" style="font-weight: 100; font-size: 18px">스페이스베이커</div>
+      </div>
+      <div class="hero-bottom">
+        <p class="label">Vision &amp; Space +</p>
+        <p class="body" style="">당신의 공간을 감도있게 빚어냅니다.<br>모던 &amp; 미니멀 주거 인테리어 전문,<br>서울·경기 전역 무료 상담부터 시작하세요.</p>
+        <button class="pill-cta" onclick="document.getElementById('survey').scrollIntoView({behavior:'smooth', block:'start'})">
+          무료 상담 신청
+          <span class="arrow" aria-hidden="true"></span>
+        </button>
+      </div>
+    </section>
+
+    <!-- ========== 2. STATS ========== -->
+    <section class="stats" data-screen-label="02 Stats">
+      <p class="label" style="text-align: center">By the numbers</p>
+      <div class="stat-row">
+        <div class="stat-cell">
+          <div class="stat-num" style="text-align: center"><span class="count-up" data-target="10">0</span><span class="unit" style="color: rgb(10, 10, 10)">+</span></div>
+          <div class="stat-label" style="text-align: center">년 경력</div>
+        </div>
+        <div class="stat-cell">
+          <div class="stat-num" style="text-align: center"><span class="count-up" data-target="200">0</span><span class="unit" style="color: rgb(10, 10, 10)">+</span></div>
+          <div class="stat-label" style="text-align: center">시공 실적</div>
+        </div>
+        <div class="stat-cell">
+          <div class="stat-num" style="text-align: center"><span class="count-up" data-target="98">0</span><span class="unit" style="color: rgb(10, 10, 10)">%</span></div>
+          <div class="stat-label" style="text-align: center">고객 만족도</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== 3. PORTFOLIO ========== -->
+    <section class="ed portfolio" id="portfolio" data-screen-label="03 Portfolio">
+      <p class="label">Selected Projects +</p>
+      <h2>최근 시공 사례를<br>소개합니다.</h2>
+
+      <div class="port-list" id="portList">
+      <div class="proj">
+        <div class="proj-img">
+          <div class="ph"><span class="ph-label">PROJECT&nbsp;PHOTO&nbsp;01</span></div>
+          <div class="num">01</div>
+          <div class="tag">차분함, 정돈된</div>
+        </div>
+        <p class="proj-tag">Project 01 · Apartment</p>
+        <h3 class="proj-title">송도 마스터뷰 49평</h3>
+        <p class="proj-desc">전체 리모델링 · 모던 화이트 톤으로<br>공간 전체를 새롭게 풀어낸 프로젝트.</p>
+      </div>
+
+      <div class="proj">
+        <div class="proj-img">
+          <div class="ph"><span class="ph-label">PROJECT&nbsp;PHOTO&nbsp;02</span></div>
+          <div class="num">02</div>
+          <div class="tag">화이트, 우드</div>
+        </div>
+        <p class="proj-tag">PROJECT 02 · APARTMENT</p>
+        <h3 class="proj-title">마포 도화 현대홈타운 32평</h3>
+        <p class="proj-desc">화이트와 따뜻한 우드 톤으로
+주방 구조의 한계를 극복한 프로젝트</p>
+      </div>
+
+      <div class="proj">
+        <div class="proj-img">
+          <div class="ph"><span class="ph-label">PROJECT&nbsp;PHOTO&nbsp;03</span></div>
+          <div class="num">03</div>
+          <div class="tag">개방감, 무게감</div>
+        </div>
+        <p class="proj-tag">PROJECT 03 · APARTMENT</p>
+        <h3 class="proj-title">배곧 호반베르디움 32평</h3>
+        <p class="proj-desc">주방구조를 넓게 구조변경을 진행하여
+좁고 답답했던 주방을 넓은 다이닝 공간으로</p>
+      </div>
+      </div>
+    </section>
+
+    <!-- ========== 4. PROCESS ========== -->
+    <section class="process" data-screen-label="04 Process">
+      <p class="label">How we work +</p>
+      <h2>시공 프로세스</h2>
+      <p class="body">상담부터 완성까지, 모든 단계를 직접 책임집니다.</p>
+
+      <ol class="step-list">
+        <li>
+          <div class="n">01</div>
+          <div>
+            <h4 class="t">상담 신청</h4>
+            <p class="d">아래 폼으로 편하게 문의주세요. 24시간 안에 연락드립니다.</p>
+          </div>
+        </li>
+        <li>
+          <div class="n">02</div>
+          <div>
+            <h4 class="t">현장 미팅</h4>
+            <p class="d">전문가가 직접 방문해 공간 구조와 요구사항을 진단합니다.</p>
+          </div>
+        </li>
+        <li>
+          <div class="n">03</div>
+          <div>
+            <h4 class="t">설계 · 견적</h4>
+            <p class="d">맞춤 도면과 투명한 견적을 제안드립니다.</p>
+          </div>
+        </li>
+        <li>
+          <div class="n">04</div>
+          <div>
+            <h4 class="t">시공 · 완성</h4>
+            <p class="d">책임 시공 이후 A/S까지 끝까지 함께합니다.</p>
+          </div>
+        </li>
+      </ol>
+    </section>
+
+    <!-- ========== 5. SURVEY (multi-step form) ========== -->
+    <section class="ed survey" id="survey" data-screen-label="05 Survey">
+      <p class="label">Free Consultation +</p>
+      <h2>무료 상담을<br>신청해주세요.</h2>
+      <p class="body" style="margin-bottom: 4px;">정보를 남겨주시면 24시간 내 연락드립니다.</p>
+
+      <form class="survey-card" id="surveyForm" novalidate>
+        <!-- progress bar -->
+        <div class="progress" aria-label="진행률">
+          <div class="bar" data-bar="1"></div>
+          <div class="bar" data-bar="2"></div>
+          <div class="bar" data-bar="3"></div>
+          <div class="bar" data-bar="4"></div>
+        </div>
+        <div class="progress-meta">
+          <div class="step-idx">STEP <b id="stepCurrent">01</b> / 04</div>
+          <div class="step-name" id="stepName">기본 정보</div>
+        </div>
+
+        <!-- STEP 1: 기본 정보 -->
+        <div class="step-pane active" data-step="1">
+          <h3>어떻게 호칭해드릴까요?</h3>
+          <p class="sub">상담 연락을 드릴 수 있도록 정보를 남겨주세요.</p>
+
+          <div class="field" data-field="name">
+            <label class="field-label" for="q_name">고객님 성함 <span class="req">필수</span></label>
+            <input class="text-input" type="text" id="q_name" name="name" placeholder="예: 김스페이스" autocomplete="name" />
+            <p class="field-error">성함을 입력해주세요.</p>
+          </div>
+
+          <div class="field" data-field="phone">
+            <label class="field-label" for="q_phone">연락처 <span class="req">필수</span></label>
+            <input class="text-input" type="tel" id="q_phone" name="phone" placeholder="010-0000-0000" inputmode="numeric" maxlength="13" autocomplete="tel" />
+            <p class="field-error">올바른 휴대폰 번호를 입력해주세요.</p>
+          </div>
+
+          <div class="field" data-field="contactTime">
+            <label class="field-label">희망 연락 시간대 <span class="req">필수</span></label>
+            <div class="opt-grid cols-2" data-single="contactTime">
+              <button type="button" class="opt-btn" data-value="오전 9-12시">오전 9-12시</button>
+              <button type="button" class="opt-btn" data-value="오후 12-18시">오후 12-18시</button>
+              <button type="button" class="opt-btn" data-value="저녁 18-21시">저녁 18-21시</button>
+              <button type="button" class="opt-btn" data-value="무관">언제든 무관</button>
+            </div>
+            <p class="field-error">연락 시간대를 선택해주세요.</p>
+          </div>
+        </div>
+
+        <!-- STEP 2: 공간 정보 -->
+        <div class="step-pane" data-step="2">
+          <h3>어떤 공간을<br>시공하시나요?</h3>
+          <p class="sub">공간 정보를 알려주세요.</p>
+
+          <div class="field" data-field="region">
+            <label class="field-label" for="q_region">시공 지역 <span class="req">필수</span></label>
+            <input class="text-input" type="text" id="q_region" name="region" placeholder="예: 서울시 서초구" />
+            <p class="field-error">시공 지역을 입력해주세요.</p>
+          </div>
+
+          <div class="field" data-field="houseType">
+            <label class="field-label">주거 형태 <span class="req">필수</span></label>
+            <div class="opt-grid cols-2" data-single="houseType">
+              <button type="button" class="opt-btn" data-value="아파트"><span class="ico">🏢</span> 아파트</button>
+              <button type="button" class="opt-btn" data-value="빌라·다세대"><span class="ico">🏘️</span> 빌라·다세대</button>
+              <button type="button" class="opt-btn" data-value="단독주택"><span class="ico">🏡</span> 단독주택</button>
+              <button type="button" class="opt-btn" data-value="오피스텔"><span class="ico">🏬</span> 오피스텔</button>
+            </div>
+            <p class="field-error">주거 형태를 선택해주세요.</p>
+          </div>
+
+          <div class="field" data-field="area">
+            <label class="field-label">전용 면적 <span class="req">필수</span></label>
+            <div class="opt-grid cols-2" data-single="area">
+              <button type="button" class="opt-btn" data-value="10평대">10평대</button>
+              <button type="button" class="opt-btn" data-value="20평대">20평대</button>
+              <button type="button" class="opt-btn" data-value="30평대">30평대</button>
+              <button type="button" class="opt-btn" data-value="40평 이상">40평 이상</button>
+            </div>
+            <p class="field-error">면적을 선택해주세요.</p>
+          </div>
+        </div>
+
+        <!-- STEP 3: 시공 정보 -->
+        <div class="step-pane" data-step="3">
+          <h3>시공 계획을<br>알려주세요.</h3>
+          <p class="sub">범위·예산·시기 정보는 견적 수립에 사용됩니다.</p>
+
+          <div class="field" data-field="scope">
+            <label class="field-label">시공 범위 <span class="req">필수</span> <span class="opt">복수 선택</span></label>
+            <div class="opt-grid cols-2" data-multi="scope">
+              <button type="button" class="opt-btn" data-value="전체 리모델링"><span class="ico">🏗️</span> 전체 리모델링</button>
+              <button type="button" class="opt-btn" data-value="주방"><span class="ico">🍳</span> 주방</button>
+              <button type="button" class="opt-btn" data-value="욕실"><span class="ico">🚿</span> 욕실</button>
+              <button type="button" class="opt-btn" data-value="거실"><span class="ico">🛋️</span> 거실</button>
+              <button type="button" class="opt-btn" data-value="침실"><span class="ico">🛏️</span> 침실</button>
+              <button type="button" class="opt-btn" data-value="베란다·현관"><span class="ico">🚪</span> 베란다·현관</button>
+            </div>
+            <p class="field-error">시공 범위를 한 개 이상 선택해주세요.</p>
+          </div>
+
+          <div class="field" data-field="budget">
+            <label class="field-label">예산 범위 <span class="req">필수</span></label>
+            <div class="opt-grid cols-2" data-single="budget">
+              <button type="button" class="opt-btn" data-value="1천만원 미만">1천만원 미만</button>
+              <button type="button" class="opt-btn" data-value="1천~3천만원">1천~3천만원</button>
+              <button type="button" class="opt-btn" data-value="3천~5천만원">3천~5천만원</button>
+              <button type="button" class="opt-btn" data-value="5천~1억원">5천~1억원</button>
+              <button type="button" class="opt-btn" data-value="1억원 이상">1억원 이상</button>
+              <button type="button" class="opt-btn" data-value="상담 후 결정">상담 후 결정</button>
+            </div>
+            <p class="field-error">예산 범위를 선택해주세요.</p>
+          </div>
+
+          <div class="field" data-field="timing">
+            <label class="field-label">희망 시공 시기 <span class="req">필수</span></label>
+            <div class="opt-grid cols-2" data-single="timing">
+              <button type="button" class="opt-btn" data-value="즉시">즉시</button>
+              <button type="button" class="opt-btn" data-value="1개월 내">1개월 내</button>
+              <button type="button" class="opt-btn" data-value="3개월 내">3개월 내</button>
+              <button type="button" class="opt-btn" data-value="미정">미정</button>
+            </div>
+            <p class="field-error">시공 시기를 선택해주세요.</p>
+          </div>
+        </div>
+
+        <!-- STEP 4: 추가 요청 -->
+        <div class="step-pane" data-step="4">
+          <h3>마지막으로,<br>원하시는 분위기가 있으세요?</h3>
+          <p class="sub">자세한 요청은 설계 단계에서 충분히 반영됩니다.</p>
+
+          <div class="field" data-field="notes">
+            <label class="field-label" for="q_notes">원하시는 스타일 / 참고 사항 <span class="opt">선택</span></label>
+            <textarea class="textarea-input" id="q_notes" name="notes" placeholder="예: 화이트+우드 톤 선호, 수납 공간 많이 필요,&#10;참고 이미지 인스타 @xxx 등"></textarea>
+          </div>
+
+          <div class="field" data-field="file">
+            <label class="field-label">참고 이미지 첨부 <span class="opt">선택</span></label>
+            <label class="file-drop" id="fileDrop" for="q_file">
+              <span class="fd-ico" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect x="3.5" y="4.5" width="17" height="15" rx="2.5" stroke="currentColor" stroke-width="1.5"/>
+                  <circle cx="9" cy="10" r="1.5" stroke="currentColor" stroke-width="1.5"/>
+                  <path d="M4 17l4.5-4.5 4 4 3-3L20 17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </span>
+              <span class="fd-body">
+                <span class="fd-title" id="fileText">참고 이미지 첨부</span>
+                <span class="fd-hint" id="fileHint">JPG, PNG · 여러 장 선택 가능</span>
+              </span>
+              <span class="fd-action">파일 선택</span>
+              <input type="file" id="q_file" name="file" accept="image/*" multiple />
+            </label>
+          </div>
+        </div>
+
+        <!-- SUCCESS -->
+        <div class="success-pane" id="successPane">
+          <div class="success-check" aria-hidden="true">✓</div>
+          <h3>신청 완료!</h3>
+          <p>24시간 내 연락드리겠습니다.<br>소중한 시간 내주셔서 감사합니다.</p>
+          <div class="success-meta">
+            <p class="l">CONTACT</p>
+            <p class="v">010-9251-0517 · 카카오톡 @spacebaker</p>
+          </div>
+        </div>
+
+        <!-- nav buttons -->
+        <div class="nav-row" id="navRow">
+          <button type="button" class="btn btn-prev" id="btnPrev" style="display: none;">← 이전</button>
+          <button type="button" class="btn btn-next" id="btnNext">다음 →</button>
+          <button type="button" class="btn btn-submit" id="btnSubmit" style="display: none;">상담 신청하기</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- ========== 6. FOOTER ========== -->
+    <footer class="footer" data-screen-label="06 Footer">
+      <div class="fm" style="font-family: &quot;Noto Sans KR&quot;; font-weight: 200">space baker®</div>
+      <p class="tag">스페이스베이커<br>서울 · 경기 주거 인테리어 전문</p>
+
+      <div class="contact">
+        <a href="tel:01092510517">
+          <span style="font-weight: 100">상담문의</span>
+          <span class="ar">→</span>
+        </a>
+        <a href="https://pf.kakao.com/_spacebaker/chat" target="_blank" rel="noopener">
+          <span style="font-weight: 100">카카오톡</span>
+          <span class="ar">→</span>
+        </a>
+        <a href="https://www.instagram.com/spacebaker.co.kr" target="_blank" rel="noopener">
+          <span style="font-weight: 100">Instagram</span>
+          <span class="ar">→</span>
+        </a>
+        <a href="https://blog.naver.com/emoh_home" target="_blank" rel="noopener">
+          <span style="font-weight: 100">Blog</span>
+          <span class="ar">→</span>
+        </a>
+        <a href="https://www.youtube.com/@spacebakerr" target="_blank" rel="noopener">
+          <span style="font-weight: 100">YouTube</span>
+          <span class="ar">→</span>
+        </a>
+      </div>
+
+      <div class="copyright">© 2026 SPACE BAKER. ALL RIGHTS RESERVED.</div>
+    </footer>
+
+  </main>
+
+  <!-- Lightbox container (created lazily by JS) -->
+  <div class="lb" id="lightbox" role="dialog" aria-modal="true" aria-hidden="true"></div>
+
+
+<script>
+/* ========== SURVEY MULTI-STEP FORM ========== */
+(function () {
+  /* ⚠️ Google Apps Script Web App URL — 세팅 완료 후 아래 주소를 교체하세요 */
+  const FORM_ENDPOINT = 'https://script.google.com/macros/s/AKfycbxGGtR0WMGAcJMRnoDAG59GWi9wTtQz6b7-WvwSQhW1lBavGNcutVISJERgy55qX3xU/exec';
+
+  const form = document.getElementById('surveyForm');
+  if (!form) return;
+
+  const TOTAL_STEPS = 4;
+  const STEP_NAMES = ['기본 정보', '공간 정보', '시공 정보', '추가 요청'];
+  const REQUIRED_BY_STEP = {
+    1: ['name', 'phone', 'contactTime'],
+    2: ['region', 'houseType', 'area'],
+    3: ['scope', 'budget', 'timing'],
+    4: []
+  };
+  const ERROR_MSG = {
+    name: '성함을 입력해주세요.',
+    phone: '올바른 휴대폰 번호를 입력해주세요.',
+    contactTime: '연락 시간대를 선택해주세요.',
+    region: '시공 지역을 입력해주세요.',
+    houseType: '주거 형태를 선택해주세요.',
+    area: '면적을 선택해주세요.',
+    scope: '시공 범위를 한 개 이상 선택해주세요.',
+    budget: '예산 범위를 선택해주세요.',
+    timing: '시공 시기를 선택해주세요.'
+  };
+
+  let currentStep = 1;
+  const data = {
+    name: '', phone: '', contactTime: '',
+    region: '', houseType: '', area: '',
+    scope: [], budget: '', timing: '',
+    notes: '', file: null
+  };
+
+  /* phone auto-formatter: 01012345678 → 010-1234-5678 */
+  const phoneInput = document.getElementById('q_phone');
+  phoneInput.addEventListener('input', (e) => {
+    let v = e.target.value.replace(/\D/g, '').slice(0, 11);
+    let out = v;
+    if (v.length >= 4 && v.length <= 7) {
+      out = v.slice(0, 3) + '-' + v.slice(3);
+    } else if (v.length >= 8) {
+      out = v.slice(0, 3) + '-' + v.slice(3, 7) + '-' + v.slice(7);
+    }
+    e.target.value = out;
+    data.phone = out;
+    clearError('phone');
+  });
+
+  /* text inputs */
+  document.getElementById('q_name').addEventListener('input', (e) => {
+    data.name = e.target.value.trim();
+    clearError('name');
+  });
+  document.getElementById('q_region').addEventListener('input', (e) => {
+    data.region = e.target.value.trim();
+    clearError('region');
+  });
+  document.getElementById('q_notes').addEventListener('input', (e) => {
+    data.notes = e.target.value.trim();
+  });
+
+  /* single-select */
+  form.querySelectorAll('[data-single]').forEach(grid => {
+    const fieldName = grid.dataset.single;
+    grid.querySelectorAll('.opt-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        grid.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        data[fieldName] = btn.dataset.value;
+        clearError(fieldName);
+      });
+    });
+  });
+
+  /* multi-select */
+  form.querySelectorAll('[data-multi]').forEach(grid => {
+    const fieldName = grid.dataset.multi;
+    grid.querySelectorAll('.opt-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const v = btn.dataset.value;
+        btn.classList.toggle('selected');
+        const arr = data[fieldName];
+        const idx = arr.indexOf(v);
+        if (idx === -1) arr.push(v);
+        else arr.splice(idx, 1);
+        if (arr.length > 0) clearError(fieldName);
+      });
+    });
+  });
+
+  /* file input */
+  const fileInput = document.getElementById('q_file');
+  const fileDrop = document.getElementById('fileDrop');
+  const fileText = document.getElementById('fileText');
+  const fileHint = document.getElementById('fileHint');
+  fileInput.addEventListener('change', (e) => {
+    const files = e.target.files;
+    if (files && files.length > 0) {
+      data.file = files;
+      fileDrop.classList.add('has-file');
+      if (files.length === 1) {
+        fileText.textContent = files[0].name;
+        fileHint.textContent = `${(files[0].size / 1024).toFixed(0)} KB`;
+      } else {
+        fileText.textContent = `${files.length}개 파일 선택됨`;
+        fileHint.textContent = Array.from(files).map(f => f.name).join(', ');
+      }
+    } else {
+      data.file = null;
+      fileDrop.classList.remove('has-file');
+      fileText.textContent = '참고 이미지 첨부';
+      fileHint.textContent = 'JPG, PNG · 여러 장 선택 가능';
+    }
+  });
+
+  /* validation */
+  function isValidPhone(p) {
+    return /^010-\d{4}-\d{4}$/.test(p) || /^010\d{8}$/.test((p || '').replace(/-/g, ''));
+  }
+  function validateStep(step) {
+    const fields = REQUIRED_BY_STEP[step] || [];
+    let firstInvalid = null;
+    fields.forEach(f => {
+      const el = form.querySelector(`[data-field="${f}"]`);
+      if (!el) return;
+      let invalid = false;
+      const v = data[f];
+      if (Array.isArray(v)) invalid = v.length === 0;
+      else invalid = !v || v.toString().trim() === '';
+      if (f === 'phone' && !invalid) invalid = !isValidPhone(v);
+      if (invalid) {
+        el.classList.add('has-error');
+        const err = el.querySelector('.field-error');
+        if (err) err.textContent = ERROR_MSG[f];
+        if (!firstInvalid) firstInvalid = el;
+      } else {
+        el.classList.remove('has-error');
+      }
+    });
+    if (firstInvalid) {
+      firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return false;
+    }
+    return true;
+  }
+  function clearError(field) {
+    const el = form.querySelector(`[data-field="${field}"]`);
+    if (el) el.classList.remove('has-error');
+  }
+
+  /* navigation */
+  const btnPrev = document.getElementById('btnPrev');
+  const btnNext = document.getElementById('btnNext');
+  const btnSubmit = document.getElementById('btnSubmit');
+  const stepCurrent = document.getElementById('stepCurrent');
+  const stepName = document.getElementById('stepName');
+
+  function renderStep() {
+    form.querySelectorAll('.step-pane').forEach(p => {
+      p.classList.toggle('active', Number(p.dataset.step) === currentStep);
+    });
+    form.querySelectorAll('.progress .bar').forEach(b => {
+      const n = Number(b.dataset.bar);
+      b.classList.remove('done', 'current');
+      if (n < currentStep) b.classList.add('done');
+      else if (n === currentStep) b.classList.add('current');
+    });
+    stepCurrent.textContent = String(currentStep).padStart(2, '0');
+    stepName.textContent = STEP_NAMES[currentStep - 1];
+    btnPrev.style.display = currentStep === 1 ? 'none' : '';
+    if (currentStep === TOTAL_STEPS) {
+      btnNext.style.display = 'none';
+      btnSubmit.style.display = '';
+    } else {
+      btnNext.style.display = '';
+      btnSubmit.style.display = 'none';
+    }
+    const cardTop = form.getBoundingClientRect().top + window.scrollY;
+    if (window.scrollY > cardTop - 60) {
+      window.scrollTo({ top: cardTop - 40, behavior: 'smooth' });
+    }
+  }
+
+  btnNext.addEventListener('click', () => {
+    if (!validateStep(currentStep)) return;
+    if (currentStep < TOTAL_STEPS) { currentStep++; renderStep(); }
+  });
+  btnPrev.addEventListener('click', () => {
+    if (currentStep > 1) { currentStep--; renderStep(); }
+  });
+
+  /* convert a File to base64 (for Apps Script upload) */
+  function fileToBase64(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const base64 = reader.result.split(',')[1];
+        resolve({
+          name: file.name,
+          type: file.type || 'application/octet-stream',
+          size: file.size,
+          data: base64
+        });
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+
+  function showSuccess() {
+    form.querySelectorAll('.step-pane').forEach(p => p.classList.remove('active'));
+    document.getElementById('successPane').classList.add('active');
+    document.getElementById('navRow').style.display = 'none';
+    document.querySelector('.progress').style.display = 'none';
+    document.querySelector('.progress-meta').style.display = 'none';
+    const cardTop = form.getBoundingClientRect().top + window.scrollY;
+    window.scrollTo({ top: cardTop - 40, behavior: 'smooth' });
+  }
+
+  btnSubmit.addEventListener('click', async () => {
+    if (!validateStep(currentStep)) return;
+
+    /* loading state */
+    const originalText = btnSubmit.textContent;
+    btnSubmit.disabled = true;
+    btnSubmit.textContent = '전송 중…';
+
+    try {
+      /* base64 encode attached images */
+      let files = [];
+      if (data.file && data.file.length > 0) {
+        files = await Promise.all(Array.from(data.file).map(fileToBase64));
+      }
+
+      const payload = {
+        name: data.name,
+        phone: data.phone,
+        contactTime: data.contactTime,
+        region: data.region,
+        houseType: data.houseType,
+        area: data.area,
+        scope: data.scope,
+        budget: data.budget,
+        timing: data.timing,
+        notes: data.notes,
+        files: files,
+        submittedAt: new Date().toISOString(),
+        source: 'Space Baker Landing'
+      };
+
+      if (FORM_ENDPOINT && FORM_ENDPOINT !== 'PASTE_YOUR_APPS_SCRIPT_WEB_APP_URL_HERE') {
+        /* Apps Script web app accepts simple POST as text/plain to avoid CORS preflight */
+        await fetch(FORM_ENDPOINT, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify(payload)
+        });
+      } else {
+        console.log('[SPACE BAKER · 상담 신청 / 테스트 모드]', payload);
+      }
+
+      showSuccess();
+    } catch (err) {
+      console.error('[상담 신청 전송 오류]', err);
+      btnSubmit.disabled = false;
+      btnSubmit.textContent = originalText;
+      alert('전송 중 일시적인 오류가 발생했어요.\n카카오톡 @spacebaker 또는 010-9251-0517로 연락주세요.');
+    }
+  });
+
+  renderStep();
+})();
+</script>
+
+<script>
+/* ========== PORTFOLIO DYNAMIC LOADER + LIGHTBOX ========== */
+(function () {
+  const ENDPOINT = 'https://script.google.com/macros/s/AKfycbxGGtR0WMGAcJMRnoDAG59GWi9wTtQz6b7-WvwSQhW1lBavGNcutVISJERgy55qX3xU/exec';
+  const list = document.getElementById('portList');
+  const lb = document.getElementById('lightbox');
+  if (!list || !ENDPOINT) return;
+
+  let portfolioItems = [];
+
+  function esc(s) {
+    if (s == null) return '';
+    return String(s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+  function nl2br(s) {
+    return esc(s).replace(/\n/g, '<br>');
+  }
+  function pad2(n) { return String(n).padStart(2, '0'); }
+
+  /* ---------- CARD RENDER ---------- */
+  function renderCards(items) {
+    list.innerHTML = '';
+    items.forEach((item, idx) => {
+      const num = pad2(idx + 1);
+      const category = item.category || 'Apartment';
+      const mainUrl = item.mainImage ? item.mainImage.thumb : null;
+      const count = item.imageCount || 0;
+      const showMulti = count > 1;
+
+      const card = document.createElement('div');
+      card.className = 'proj';
+      card.dataset.projectIdx = idx;
+
+      const mediaHtml = mainUrl
+        ? `<img src="${esc(mainUrl)}" alt="${esc(item.title)}" loading="lazy" referrerpolicy="no-referrer" />`
+        : `<div class="ph"><span class="ph-label">${esc(item.folderName || 'IMAGE')}</span></div>`;
+
+      card.innerHTML = `
+        <div class="proj-img">
+          ${mediaHtml}
+          <div class="num">${num}</div>
+          ${showMulti ? `<div class="count" aria-label="${count}장 이미지">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="6" y="6" width="14" height="14" rx="2.5" stroke="currentColor" stroke-width="1.8"/>
+              <path d="M4 16V6a2 2 0 012-2h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+            </svg>
+            ${count}
+          </div>` : ''}
+          ${item.tag ? `<div class="tag">${esc(item.tag)}</div>` : ''}
+        </div>
+        <p class="proj-tag">Project ${num} · ${esc(category)}</p>
+        <h3 class="proj-title">${esc(item.title)}</h3>
+        ${item.desc ? `<p class="proj-desc">${nl2br(item.desc)}</p>` : ''}
+      `;
+
+      card.addEventListener('click', () => openLightbox(idx));
+      list.appendChild(card);
+    });
+  }
+
+  /* ---------- LIGHTBOX ---------- */
+  let currentProject = null;
+  let currentIdx = 0;
+  let touchStartX = 0;
+  let touchStartY = 0;
+
+  function openLightbox(projectIdx) {
+    const item = portfolioItems[projectIdx];
+    if (!item || !item.images || item.images.length === 0) return;
+    currentProject = item;
+    currentIdx = 0;
+    renderLightbox();
+    lb.classList.add('open');
+    lb.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('lb-open');
+  }
+  function closeLightbox() {
+    lb.classList.remove('open');
+    lb.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('lb-open');
+    currentProject = null;
+  }
+  function renderLightbox() {
+    if (!currentProject) return;
+    const imgs = currentProject.images;
+    const total = imgs.length;
+    lb.innerHTML = `
+      <button class="lb-close" id="lbClose" aria-label="닫기">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+          <path d="M2 2l10 10M12 2L2 12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+        </svg>
+      </button>
+      <div class="lb-head">
+        <div class="lb-title">${esc(currentProject.title)}</div>
+        <div class="lb-counter"><b id="lbCur">${pad2(currentIdx + 1)}</b> / ${pad2(total)}</div>
+      </div>
+      <div class="lb-stage" id="lbStage">
+        <button class="lb-nav prev" id="lbPrev" aria-label="이전">
+          <svg viewBox="0 0 14 14" fill="none"><path d="M9 1L3 7l6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div class="lb-track" id="lbTrack" style="transform: translateX(0%)">
+          ${imgs.map((im, i) => `
+            <div class="lb-slide" data-idx="${i}">
+              ${i === currentIdx || i === currentIdx - 1 || i === currentIdx + 1
+                ? `<img src="${esc(im.full)}" alt="${esc(currentProject.title)} ${i + 1}" referrerpolicy="no-referrer" />`
+                : ''}
+            </div>
+          `).join('')}
+        </div>
+        <button class="lb-nav next" id="lbNext" aria-label="다음">
+          <svg viewBox="0 0 14 14" fill="none"><path d="M5 1l6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+      <div class="lb-thumbs">
+        <div class="lb-thumbs-inner">
+          ${imgs.map((im, i) => `
+            <button class="lb-thumb ${i === currentIdx ? 'active' : ''}" data-idx="${i}">
+              <img src="${esc(im.thumb)}" alt="" loading="lazy" referrerpolicy="no-referrer" />
+            </button>
+          `).join('')}
+        </div>
+      </div>
+    `;
+
+    bindLightboxEvents();
+    updateSlide();
+  }
+
+  function bindLightboxEvents() {
+    document.getElementById('lbClose').addEventListener('click', closeLightbox);
+    document.getElementById('lbPrev').addEventListener('click', () => navigate(-1));
+    document.getElementById('lbNext').addEventListener('click', () => navigate(1));
+
+    lb.querySelectorAll('.lb-thumb').forEach(btn => {
+      btn.addEventListener('click', () => {
+        currentIdx = Number(btn.dataset.idx);
+        updateSlide();
+      });
+    });
+
+    const stage = document.getElementById('lbStage');
+    stage.addEventListener('touchstart', (e) => {
+      touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
+    }, { passive: true });
+    stage.addEventListener('touchend', (e) => {
+      const dx = e.changedTouches[0].clientX - touchStartX;
+      const dy = e.changedTouches[0].clientY - touchStartY;
+      if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) {
+        navigate(dx < 0 ? 1 : -1);
+      }
+    }, { passive: true });
+  }
+
+  function navigate(dir) {
+    if (!currentProject) return;
+    const total = currentProject.images.length;
+    const next = currentIdx + dir;
+    if (next < 0 || next >= total) return;
+    currentIdx = next;
+    updateSlide();
+  }
+
+  function updateSlide() {
+    if (!currentProject) return;
+    const total = currentProject.images.length;
+    const track = document.getElementById('lbTrack');
+    if (!track) return;
+
+    track.style.transform = `translateX(-${currentIdx * 100}%)`;
+    document.getElementById('lbCur').textContent = pad2(currentIdx + 1);
+
+    /* lazy-load neighbors */
+    track.querySelectorAll('.lb-slide').forEach((sl, i) => {
+      const need = Math.abs(i - currentIdx) <= 1;
+      if (need && !sl.querySelector('img')) {
+        const im = currentProject.images[i];
+        const imgEl = document.createElement('img');
+        imgEl.src = im.full;
+        imgEl.alt = `${currentProject.title} ${i + 1}`;
+        imgEl.setAttribute('referrerpolicy', 'no-referrer');
+        sl.appendChild(imgEl);
+      }
+    });
+
+    /* active thumb */
+    lb.querySelectorAll('.lb-thumb').forEach((t, i) => {
+      t.classList.toggle('active', i === currentIdx);
+      if (i === currentIdx) {
+        t.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+      }
+    });
+
+    /* nav button states */
+    const prev = document.getElementById('lbPrev');
+    const next = document.getElementById('lbNext');
+    if (prev) prev.disabled = currentIdx === 0;
+    if (next) next.disabled = currentIdx === total - 1;
+  }
+
+  /* keyboard nav */
+  document.addEventListener('keydown', (e) => {
+    if (!lb.classList.contains('open')) return;
+    if (e.key === 'Escape') closeLightbox();
+    else if (e.key === 'ArrowLeft') navigate(-1);
+    else if (e.key === 'ArrowRight') navigate(1);
+  });
+
+  /* close on backdrop click (not on content) */
+  lb.addEventListener('click', (e) => {
+    if (e.target === lb) closeLightbox();
+  });
+
+  /* ---------- LOAD ---------- */
+  async function load() {
+    try {
+      const url = ENDPOINT + (ENDPOINT.indexOf('?') >= 0 ? '&' : '?') + 'action=portfolio&t=' + Date.now();
+      const res = await fetch(url, { method: 'GET' });
+      const data = await res.json();
+      if (data && data.ok && Array.isArray(data.items) && data.items.length) {
+        portfolioItems = data.items;
+        renderCards(data.items);
+      } else if (data && !data.ok) {
+        console.warn('[Portfolio] 서버 응답:', data.error || data);
+      }
+    } catch (err) {
+      console.warn('[Portfolio] 동적 로딩 실패, 정적 카드 유지', err);
+    }
+  }
+
+  load();
+})();
+</script>
+
+<script>
+/* ========== STAT COUNT-UP ANIMATION ========== */
+(function () {
+  const els = document.querySelectorAll('.count-up');
+  if (!els.length) return;
+
+  const DURATION = 1600; // ms
+  const easeOutExpo = (t) => (t === 1 ? 1 : 1 - Math.pow(2, -10 * t));
+
+  function animate(el) {
+    const target = Number(el.dataset.target || 0);
+    /* cancel any previous frame for this element */
+    if (el._raf) cancelAnimationFrame(el._raf);
+    const start = performance.now();
+    function tick(now) {
+      const elapsed = now - start;
+      const p = Math.min(1, elapsed / DURATION);
+      const v = Math.round(target * easeOutExpo(p));
+      el.textContent = v;
+      if (p < 1) el._raf = requestAnimationFrame(tick);
+      else { el.textContent = target; el._raf = null; }
+    }
+    el._raf = requestAnimationFrame(tick);
+  }
+  function reset(el) {
+    if (el._raf) { cancelAnimationFrame(el._raf); el._raf = null; }
+    el.textContent = '0';
+  }
+
+  if ('IntersectionObserver' in window) {
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          animate(e.target);
+        } else {
+          /* fully out of view → reset so it can re-run next time */
+          reset(e.target);
+        }
+      });
+    }, { threshold: 0.15 });
+    els.forEach(el => io.observe(el));
+  } else {
+    els.forEach(animate);
+  }
+})();
+</script>
+
+</body></html>
