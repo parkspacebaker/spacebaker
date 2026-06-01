@@ -6,6 +6,8 @@
 <title>SPACE BAKER · 스페이스베이커</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link rel="preconnect" href="https://lh3.googleusercontent.com" crossorigin="">
+<link rel="dns-prefetch" href="https://lh3.googleusercontent.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;800;900&amp;display=swap">
 <style>
   @font-face {
@@ -370,7 +372,10 @@
     height: 100%;
     object-fit: cover;
     display: block;
-    transition: opacity 0.35s ease;
+    transition: opacity 0.5s ease;
+  }
+  .proj-img img.fade-in {
+    opacity: 0;
   }
   .proj-img img.loading {
     opacity: 0;
@@ -1713,7 +1718,10 @@
     items.forEach((item, idx) => {
       const num = pad2(idx + 1);
       const category = item.category || 'Apartment';
-      const mainUrl = item.mainImage ? item.mainImage.thumb : null;
+      /* smaller card thumbnail (w640) loads faster than the gallery-size one */
+      const mainUrl = item.mainImage
+        ? (item.mainImage.card || item.mainImage.thumb)
+        : null;
       const count = item.imageCount || 0;
       const showMulti = count > 1;
 
@@ -1722,7 +1730,7 @@
       card.dataset.projectIdx = idx;
 
       const mediaHtml = mainUrl
-        ? `<img src="${esc(mainUrl)}" alt="${esc(item.title)}" loading="lazy" referrerpolicy="no-referrer" />`
+        ? `<img class="fade-in" src="${esc(mainUrl)}" alt="${esc(item.title)}" loading="lazy" decoding="async" referrerpolicy="no-referrer" onload="this.classList.remove('fade-in')" />`
         : `<div class="ph"><span class="ph-label">${esc(item.folderName || 'IMAGE')}</span></div>`;
 
       card.innerHTML = `
@@ -1746,6 +1754,16 @@
       card.addEventListener('click', () => openLightbox(idx));
       list.appendChild(card);
     });
+  }
+
+  /* derive a smaller card-size thumbnail from the drive thumb url */
+  function withCardSize(items) {
+    items.forEach(it => {
+      if (it.mainImage && it.mainImage.thumb && !it.mainImage.card) {
+        it.mainImage.card = it.mainImage.thumb.replace(/=w\d+$/, '=w640');
+      }
+    });
+    return items;
   }
 
   /* ---------- LIGHTBOX ---------- */
@@ -1901,20 +1919,57 @@
     if (e.target === lb) closeLightbox();
   });
 
-  /* ---------- LOAD ---------- */
-  async function load() {
+  /* ---------- LOAD (stale-while-revalidate cache) ---------- */
+  const CACHE_KEY = 'sb_portfolio_v1';
+  const CACHE_TTL = 1000 * 60 * 30; // 30 minutes
+
+  function applyData(items) {
+    portfolioItems = withCardSize(items);
+    renderCards(portfolioItems);
+  }
+
+  function readCache() {
     try {
-      const url = ENDPOINT + (ENDPOINT.indexOf('?') >= 0 ? '&' : '?') + 'action=portfolio&t=' + Date.now();
-      const res = await fetch(url, { method: 'GET' });
-      const data = await res.json();
-      if (data && data.ok && Array.isArray(data.items) && data.items.length) {
-        portfolioItems = data.items;
-        renderCards(data.items);
-      } else if (data && !data.ok) {
-        console.warn('[Portfolio] 서버 응답:', data.error || data);
+      const raw = localStorage.getItem(CACHE_KEY);
+      if (!raw) return null;
+      const parsed = JSON.parse(raw);
+      if (!parsed || !Array.isArray(parsed.items)) return null;
+      return parsed;
+    } catch (e) { return null; }
+  }
+
+  function writeCache(items) {
+    try {
+      localStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), items }));
+    } catch (e) { /* storage full / private mode — ignore */ }
+  }
+
+  async function fetchFresh() {
+    const url = ENDPOINT + (ENDPOINT.indexOf('?') >= 0 ? '&' : '?') + 'action=portfolio&t=' + Date.now();
+    const res = await fetch(url, { method: 'GET' });
+    const data = await res.json();
+    if (data && data.ok && Array.isArray(data.items) && data.items.length) {
+      writeCache(data.items);
+      return data.items;
+    }
+    if (data && !data.ok) console.warn('[Portfolio] 서버 응답:', data.error || data);
+    return null;
+  }
+
+  async function load() {
+    /* 1) instantly render from cache if available (fast repeat visits) */
+    const cached = readCache();
+    if (cached) applyData(cached.items);
+
+    /* 2) revalidate in background — only re-render if data changed */
+    try {
+      const fresh = await fetchFresh();
+      if (fresh) {
+        const changed = !cached || JSON.stringify(fresh) !== JSON.stringify(cached.items);
+        if (changed) applyData(fresh);
       }
     } catch (err) {
-      console.warn('[Portfolio] 동적 로딩 실패, 정적 카드 유지', err);
+      if (!cached) console.warn('[Portfolio] 동적 로딩 실패, 정적 카드 유지', err);
     }
   }
 
