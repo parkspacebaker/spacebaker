@@ -218,7 +218,8 @@
   .btn-add { display: inline-flex; align-items: center; gap: 7px; background: var(--ink); color: #fff; border: none; padding: 11px 18px; border-radius: 9px; font-size: 13px; font-weight: 700; cursor: pointer; }
   .btn-add svg { width: 15px; height: 15px; }
   .pf-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
-  .pf-card { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+  .pf-card { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; cursor: grab; }
+  .pf-card:active { cursor: grabbing; }
   .pf-cover { position: relative; aspect-ratio: 4/3; background: var(--bg); overflow: hidden; }
   .pf-cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
   .pf-cover .ph { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: var(--ink-4); font-size: 12px; }
@@ -737,10 +738,10 @@ function renderPortfolio(){
     const cover = it.images && it.images.length
       ? (it.images.find(im=>/main/i.test(im.name))||it.images[0])
       : null;
-    return `<div class="pf-card">
+    return `<div class="pf-card" data-idx="${i}" draggable="true">
       <div class="pf-cover">
-        ${cover?`<img src="${esc(cover.thumb)}" referrerpolicy="no-referrer" alt="">`:'<div class="ph">사진 없음</div>'}
-        <span class="order-badge">${i+1}</span>
+        ${cover?`<img src="${esc(cover.thumb)}" referrerpolicy="no-referrer" alt="" draggable="false">`:'<div class="ph">사진 없음</div>'}
+        <span class="order-badge">⠿ ${i+1}</span>
         <span class="cnt-badge">📷 ${it.imageCount}</span>
       </div>
       <div class="pf-body">
@@ -763,6 +764,30 @@ function renderPortfolio(){
   grid.querySelectorAll('[data-del]').forEach(b=>b.addEventListener('click',()=>deleteProject(PF_ITEMS[Number(b.dataset.del)])));
   grid.querySelectorAll('[data-up]').forEach(b=>b.addEventListener('click',()=>moveProject(Number(b.dataset.up),-1)));
   grid.querySelectorAll('[data-down]').forEach(b=>b.addEventListener('click',()=>moveProject(Number(b.dataset.down),1)));
+  bindCardDrag(grid);
+}
+
+/* 프로젝트 카드 드래그&드롭 순서 변경 */
+let cardDragIdx = null;
+function bindCardDrag(grid){
+  grid.querySelectorAll('.pf-card').forEach(el=>{
+    el.addEventListener('dragstart',e=>{ cardDragIdx=Number(el.dataset.idx); el.style.opacity='0.4'; });
+    el.addEventListener('dragend',e=>{ el.style.opacity=''; });
+    el.addEventListener('dragover',e=>{ e.preventDefault(); el.style.outline='2px dashed var(--gold)'; el.style.outlineOffset='-2px'; });
+    el.addEventListener('dragleave',e=>{ el.style.outline=''; });
+    el.addEventListener('drop',e=>{
+      e.preventDefault(); el.style.outline='';
+      const dropIdx=Number(el.dataset.idx);
+      if(cardDragIdx===null||cardDragIdx===dropIdx) return;
+      const moved=PF_ITEMS.splice(cardDragIdx,1)[0];
+      PF_ITEMS.splice(dropIdx,0,moved);
+      renderPortfolio();
+      const orders = PF_ITEMS.map((it,i)=>({folderName:it.folderName, order:i+1}));
+      PF_ITEMS.forEach((it,i)=>it.order=i+1);
+      apiPost({ action:'portfolioReorder', password:PASSWORD, orders:orders })
+        .then(()=>toast('순서 변경됨')).catch(()=>toast('순서 저장 실패'));
+    });
+  });
 }
 
 async function moveProject(idx, dir){
@@ -806,7 +831,7 @@ function openProjectModal(item){
       <div class="mf"><label>설명</label><textarea id="pfDesc" placeholder="시공 내용을 간단히 적어주세요">${esc(item?item.desc:'')}</textarea></div>
 
       <div class="mf" id="uploadSection" style="${isNew?'opacity:.5;pointer-events:none':''}">
-        <label>사진 ${isNew?'<span style="color:var(--ink-3);font-weight:500">(저장 후 추가할 수 있어요)</span>':'<span style="color:var(--ink-3);font-weight:500">— ☆ 대표 지정 / ✕ 삭제</span>'}</label>
+        <label>사진 ${isNew?'<span style="color:var(--ink-3);font-weight:500">(저장 후 추가할 수 있어요)</span>':'<span style="color:var(--ink-3);font-weight:500">— ☆ 대표 지정 / ✕ 삭제 / 드래그로 순서 변경</span>'}</label>
         <div class="dropzone" id="dropzone">
           <svg viewBox="0 0 24 24" fill="none"><path d="M12 16V4m0 0L7 9m5-5l5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
           <div class="dz-t">사진을 드래그하거나 클릭해서 선택</div>
@@ -836,26 +861,56 @@ function renderThumbs(){
   if(!pfCurrent) return;
   const grid = $('thumbGrid');
   const imgs = pfCurrent.images||[];
-  grid.innerHTML = imgs.map(im=>{
+  grid.innerHTML = imgs.map((im,i)=>{
     const isMain = /main/i.test(im.name);
-    return `<div class="thumb-item ${isMain?'main':''}" data-id="${im.id}">
-      <img src="${esc(im.thumb)}" referrerpolicy="no-referrer" alt="">
+    return `<div class="thumb-item ${isMain?'main':''}" data-id="${im.id}" data-idx="${i}" draggable="true">
+      <img src="${esc(im.thumb)}" referrerpolicy="no-referrer" alt="" draggable="false">
       <button class="star" data-star="${im.id}" title="대표 지정">${isMain?'★':'☆'}</button>
       <button class="del" data-delimg="${im.id}" title="삭제">✕</button>
       ${isMain?'<div class="main-label">대표</div>':''}
     </div>`;
   }).join('') || '<div style="grid-column:1/-1;color:var(--ink-4);font-size:12.5px;padding:10px 0;">아직 사진이 없어요. 위에서 추가하세요.</div>';
 
-  grid.querySelectorAll('[data-star]').forEach(b=>b.addEventListener('click',()=>setMain(b.dataset.star)));
-  grid.querySelectorAll('[data-delimg]').forEach(b=>b.addEventListener('click',()=>delImage(b.dataset.delimg)));
+  grid.querySelectorAll('[data-star]').forEach(b=>b.addEventListener('click',(e)=>{e.stopPropagation();setMain(b.dataset.star);}));
+  grid.querySelectorAll('[data-delimg]').forEach(b=>b.addEventListener('click',(e)=>{e.stopPropagation();delImage(b.dataset.delimg);}));
+  bindThumbDrag(grid);
+}
+
+/* 썸네일 드래그&드롭 순서 변경 */
+let dragIdx = null;
+function bindThumbDrag(grid){
+  grid.querySelectorAll('.thumb-item').forEach(el=>{
+    el.addEventListener('dragstart',e=>{ dragIdx=Number(el.dataset.idx); el.style.opacity='0.4'; });
+    el.addEventListener('dragend',e=>{ el.style.opacity=''; });
+    el.addEventListener('dragover',e=>{ e.preventDefault(); el.style.outline='2px dashed var(--gold)'; el.style.outlineOffset='-2px'; });
+    el.addEventListener('dragleave',e=>{ el.style.outline=''; });
+    el.addEventListener('drop',e=>{
+      e.preventDefault(); el.style.outline='';
+      const dropIdx=Number(el.dataset.idx);
+      if(dragIdx===null||dragIdx===dropIdx) return;
+      const arr=pfCurrent.images;
+      const moved=arr.splice(dragIdx,1)[0];
+      arr.splice(dropIdx,0,moved);
+      renderThumbs();
+      saveImageOrder();
+    });
+  });
+}
+async function saveImageOrder(){
+  if(!pfCurrent) return;
+  const order = pfCurrent.images.map(im=>im.id);
+  try { await apiPost({ action:'portfolioReorderImages', password:PASSWORD, folderId:pfCurrent.folderId, order:order }); toast('사진 순서 저장됨'); }
+  catch(e){ toast('순서 저장 실패'); }
 }
 
 async function setMain(fileId){
   if(!pfCurrent) return;
   try {
     await apiPost({ action:'portfolioSetMain', password:PASSWORD, folderId:pfCurrent.folderId, fileId:fileId });
-    pfCurrent.images.forEach(im=>{ im.name = im.name.replace(/^00_main_/i,'').replace(/(^|_)main_/i,'$1'); });
-    const t = pfCurrent.images.find(im=>im.id===fileId); if(t && !/main/i.test(t.name)) t.name='00_main_'+t.name;
+    /* 로컬 반영: main_ 마커를 대상에만 토글 (순서 prefix는 보존) */
+    pfCurrent.images.forEach(im=>{ im.name = im.name.replace(/^(\d+_)?(00_)?main_/i, (m,p)=> p||''); });
+    const t = pfCurrent.images.find(im=>im.id===fileId);
+    if(t && !/main/i.test(t.name)){ const p=(t.name.match(/^\d+_/)||[''])[0]; t.name = p + 'main_' + t.name.replace(/^\d+_/,''); }
     renderThumbs(); toast('대표 사진 지정됨');
   } catch(e){ toast('실패: '+(e.message||e)); }
 }
