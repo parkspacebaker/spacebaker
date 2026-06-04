@@ -1813,11 +1813,17 @@ function getAttribution() {
     });
   }
 
+  /* re-size any drive CDN url on the fly (Google resizes server-side via =w###) */
+  function sized(url, w) {
+    if (!url) return url;
+    return /=w\d+/.test(url) ? url.replace(/=w\d+(-h\d+)?$/, '=w' + w) : url + '=w' + w;
+  }
+
   /* derive a smaller card-size thumbnail from the drive thumb url */
   function withCardSize(items) {
     items.forEach(it => {
       if (it.mainImage && it.mainImage.thumb && !it.mainImage.card) {
-        it.mainImage.card = it.mainImage.thumb.replace(/=w\d+$/, '=w640');
+        it.mainImage.card = sized(it.mainImage.thumb, 640);
       }
     });
     return items;
@@ -1867,7 +1873,7 @@ function getAttribution() {
           ${imgs.map((im, i) => `
             <div class="lb-slide" data-idx="${i}">
               ${i === currentIdx || i === currentIdx - 1 || i === currentIdx + 1
-                ? `<img src="${esc(im.full)}" alt="${esc(currentProject.title)} ${i + 1}" referrerpolicy="no-referrer" />`
+                ? `<img src="${esc(sized(im.full, 1280))}" alt="${esc(currentProject.title)} ${i + 1}" decoding="async" referrerpolicy="no-referrer" />`
                 : ''}
             </div>
           `).join('')}
@@ -1880,7 +1886,7 @@ function getAttribution() {
         <div class="lb-thumbs-inner">
           ${imgs.map((im, i) => `
             <button class="lb-thumb ${i === currentIdx ? 'active' : ''}" data-idx="${i}">
-              <img src="${esc(im.thumb)}" alt="" loading="lazy" referrerpolicy="no-referrer" />
+              <img src="${esc(sized(im.thumb, 120))}" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer" />
             </button>
           `).join('')}
         </div>
@@ -1941,8 +1947,9 @@ function getAttribution() {
       if (need && !sl.querySelector('img')) {
         const im = currentProject.images[i];
         const imgEl = document.createElement('img');
-        imgEl.src = im.full;
+        imgEl.src = sized(im.full, 1280);
         imgEl.alt = `${currentProject.title} ${i + 1}`;
+        imgEl.setAttribute('decoding', 'async');
         imgEl.setAttribute('referrerpolicy', 'no-referrer');
         sl.appendChild(imgEl);
       }
