@@ -1091,7 +1091,7 @@
     <!-- ========== 1. HERO ========== -->
     <section class="hero" data-screen-label="01 Hero">
       <div class="hero-bg"></div>
-      <video class="hero-video" src="hero.mp4" autoplay muted loop playsinline preload="metadata" disablepictureinpicture></video>
+      <video class="hero-video" data-src="hero.mp4" autoplay muted loop playsinline preload="none" disablepictureinpicture></video>
       <div class="hero-overlay"></div>
       <div class="hero-title" style="font-weight: 600">
                 <h1 style="letter-spacing: -0.95px; line-height: 1.8; font-weight: 700; font-family: &#39;Quanty&#39;, &#39;Noto Sans KR&#39;, sans-serif; text-transform: none; font-size: 45px">space baker<div style="font-size: 25px; font-weight: 100; font-family: &#39;Quanty&#39;, &#39;Noto Sans KR&#39;, sans-serif">
@@ -2144,4 +2144,20 @@ function getAttribution() {
 })();
 </script>
 
+<script>
+/* 히어로 영상은 첫 화면(텍스트·폰트·폼) 렌더가 끝난 뒤에 불러옵니다.
+   → 영상이 대역폭을 선점하지 않아 페이지가 즉시 뜹니다. */
+(function(){
+  var v = document.querySelector('.hero-video[data-src]');
+  if (!v) return;
+  function attach(){
+    if (v.src) return;
+    v.src = v.getAttribute('data-src');
+    v.preload = 'auto';
+    var p = v.play(); if (p && p.catch) p.catch(function(){});
+  }
+  if (document.readyState === 'complete') setTimeout(attach, 200);
+  else window.addEventListener('load', function(){ setTimeout(attach, 200); });
+})();
+</script>
 </body></html>
