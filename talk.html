@@ -3,15 +3,7 @@
 
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<title>SPACE BAKER · 스페이스베이커</title>
-<meta name="description" content="감도높은 공간을 빚습니다 — 모던 & 미니멀 주거 인테리어 전문, 서울·경기 전역. 무료 상담부터 시작하세요.">
-<meta property="og:type" content="website">
-<meta property="og:title" content="SPACE BAKER · 스페이스베이커">
-<meta property="og:description" content="감도높은 공간을 빚습니다 — 모던 & 미니멀 주거 인테리어 전문, 서울·경기 전역. 무료 상담부터 시작하세요.">
-<meta property="og:url" content="https://spacebaker.vercel.app/">
-<meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="SPACE BAKER · 스페이스베이커">
-<meta name="twitter:description" content="감도높은 공간을 빚습니다 — 모던 & 미니멀 주거 인테리어 전문, 서울·경기 전역. 무료 상담부터 시작하세요.">
+<title>스페이스베이커 · 가장 가까운 인테리어 상담</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link rel="preconnect" href="https://lh3.googleusercontent.com" crossorigin="">
@@ -35,9 +27,9 @@
     --ink-4: #B5B0A8;
     --line: #E8E4DC;
     --line-2: #EFEBE3;
-    --gold: rgb(225, 248, 0);
-    --gold-deep: rgb(190, 215, 0);
-    --gold-soft: rgb(225, 248, 0);
+    --gold: #0054f8;
+    --gold-deep: #0044c8;
+    --gold-soft: #7AA5FF;
     --radius: 18px;
     --radius-lg: 24px;
   }
@@ -153,7 +145,7 @@
   .hero-bg {
     position: absolute; inset: 0;
     background:
-      radial-gradient(80% 60% at 50% 40%, rgba(225,248,0,0.10), transparent 70%),
+      radial-gradient(80% 60% at 50% 40%, rgba(0,84,248,0.10), transparent 70%),
       radial-gradient(120% 80% at 100% 0%, rgba(0,0,0,0.5), transparent 60%),
       linear-gradient(180deg, #2a2520 0%, #1a1612 100%);
   }
@@ -260,12 +252,12 @@
     cursor: pointer;
     text-decoration: none;
     transition: transform 0.18s ease, background 0.18s ease, box-shadow 0.18s ease;
-    box-shadow: 0 8px 24px -8px rgba(225,248,0,0.6);
+    box-shadow: 0 8px 24px -8px rgba(0,84,248,0.6);
   }
   .pill-cta:hover {
-    background: rgb(208, 230, 0);
+    background: #0048d6;
     transform: translateY(-1px);
-    box-shadow: 0 12px 28px -8px rgba(225,248,0,0.7);
+    box-shadow: 0 12px 28px -8px rgba(0,84,248,0.7);
   }
   .pill-cta:active { transform: translateY(0); }
   .pill-cta .arrow {
@@ -392,8 +384,8 @@
     position: absolute; inset: 0;
     background-image:
       linear-gradient(135deg,
-        rgba(225,248,0,0.06) 0,
-        rgba(225,248,0,0.06) 1px,
+        rgba(0,84,248,0.06) 0,
+        rgba(0,84,248,0.06) 1px,
         transparent 1px,
         transparent 18px);
     display: flex; align-items: center; justify-content: center;
@@ -784,7 +776,7 @@
   .field-label .req {
     color: var(--gold-deep);
     font-size: 10px;
-    background: rgba(225,248,0,0.5);
+    background: rgba(0,84,248,0.5);
     padding: 2px 6px;
     border-radius: 4px;
     font-weight: 700;
@@ -816,7 +808,7 @@
   .textarea-input:focus {
     outline: none;
     border-color: var(--ink);
-    box-shadow: 0 0 0 3px rgba(225,248,0,0.25);
+    box-shadow: 0 0 0 3px rgba(0,84,248,0.25);
   }
   .text-input::placeholder,
   .textarea-input::placeholder { color: var(--ink-4); }
@@ -870,7 +862,7 @@
   }
   .opt-btn.selected {
     border-color: var(--ink);
-    background: rgba(225,248,0,0.18);
+    background: rgba(0,84,248,0.18);
     color: var(--ink);
     font-weight: 700;
     box-shadow: inset 0 0 0 1px var(--ink);
@@ -933,7 +925,7 @@
   .file-drop:hover .fd-action { color: var(--ink); border-color: var(--ink); }
   .file-drop.has-file {
     border-color: var(--ink);
-    background: rgba(225,248,0,0.10);
+    background: rgba(0,84,248,0.10);
   }
   .file-drop.has-file .fd-ico { background: var(--gold); color: var(--ink); }
   .file-drop.has-file .fd-action { color: var(--ink); border-color: var(--ink); background: #fff; }
@@ -975,7 +967,7 @@
     background: var(--gold);
     color: var(--ink);
   }
-  .btn-submit:hover { background: rgb(208, 230, 0); transform: translateY(-1px); }
+  .btn-submit:hover { background: #0048d6; transform: translateY(-1px); }
   .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
 
   /* success */
@@ -1083,129 +1075,257 @@
     letter-spacing: 0.04em;
     text-align: left;
   }
+
+  /* ============================================================
+     TALK PAGE — 소통 중심 랜딩 (카카오톡 UI + 폰 목업)
+     ============================================================ */
+  .hero-talk {
+    position: relative;
+    background:
+      radial-gradient(120% 70% at 50% 0%, #FBF8F4 0%, transparent 60%),
+      linear-gradient(180deg, var(--bg) 0%, var(--bg) 60%, var(--bg-soft) 100%);
+    padding: 46px 24px 48px;
+    text-align: center;
+    overflow: hidden;
+  }
+  .live-pill {
+    display: inline-flex; align-items: center; gap: 7px;
+    white-space: nowrap;
+    background: #fff; border: 1px solid var(--line);
+    padding: 7px 14px; border-radius: 999px;
+    font-size: 12px; font-weight: 700; color: var(--ink-2);
+    box-shadow: 0 4px 14px -8px rgba(0,0,0,0.2);
+  }
+  .live-pill .ld { width: 7px; height: 7px; border-radius: 50%; background: #18b368; position: relative; }
+  .live-pill .ld::after { content:""; position:absolute; inset:-4px; border-radius:50%; background:#18b368; opacity:.3; animation: livep 1.6s ease-out infinite; }
+  @keyframes livep { 0%{transform:scale(.6);opacity:.5} 100%{transform:scale(1.8);opacity:0} }
+  .hero-talk h1 {
+    font-size: 32px; line-height: 1.28; font-weight: 800;
+    letter-spacing: -0.03em; color: var(--ink);
+    margin: 20px 0 0;
+  }
+  .hero-talk h1 .hl { color: var(--gold); }
+  .hero-talk .lead {
+    font-size: 14.5px; line-height: 1.7; color: var(--ink-3);
+    margin: 14px auto 0; max-width: 30ch;
+  }
+  .phone {
+    width: 300px; max-width: 86vw; margin: 34px auto 0;
+    background: #15110d; border-radius: 44px; padding: 10px;
+    box-shadow: 0 36px 70px -28px rgba(20,12,4,0.55), 0 0 0 1px rgba(0,0,0,0.06);
+    position: relative;
+  }
+  .phone::before {
+    content: ""; position: absolute; top: 10px; left: 50%; transform: translateX(-50%);
+    width: 120px; height: 26px; background: #15110d; border-radius: 0 0 18px 18px; z-index: 5;
+  }
+  .phone-screen {
+    border-radius: 34px; overflow: hidden; background: #b2c7d9;
+    height: 528px; display: flex; flex-direction: column; position: relative;
+  }
+  .kk-head {
+    display: flex; align-items: center; gap: 10px;
+    padding: 30px 14px 10px; background: #b2c7d9; flex-shrink: 0;
+  }
+  .kk-head .back { color: #2c3b47; font-size: 19px; line-height: 1; }
+  .kk-head .ava { width: 30px; height: 30px; border-radius: 11px; background: var(--gold); display: flex; align-items: center; justify-content: center; font-size: 15px; }
+  .kk-head .nm { font-size: 14px; font-weight: 700; color: #1d2a34; letter-spacing: -0.02em; }
+  .kk-head .icons { margin-left: auto; color: #3a4a56; font-size: 15px; letter-spacing: 3px; }
+  .kk-body {
+    flex: 1; overflow: hidden; padding: 12px 11px 4px;
+    display: flex; flex-direction: column; gap: 7px;
+    scroll-behavior: smooth;
+  }
+  .kk-date { align-self: center; background: rgba(40,55,68,0.32); color: #fff; font-size: 10px; font-weight: 600; padding: 3px 11px; border-radius: 999px; margin: 4px 0 6px; }
+  .kk-row { display: flex; gap: 6px; max-width: 88%; align-items: flex-end; min-width: 0; }
+  .kk-row.left { align-self: flex-start; }
+  .kk-row.right { align-self: flex-end; flex-direction: row-reverse; }
+  .kk-ava { width: 30px; height: 30px; border-radius: 11px; background: var(--gold); flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+  .kk-col { display: flex; flex-direction: column; gap: 3px; min-width: 0; flex: 0 1 auto; }
+  .kk-name { font-size: 10.5px; color: #2f3f4b; margin-left: 3px; }
+  .kk-row.right .kk-name { text-align: right; margin-left: 0; margin-right: 3px; }
+  .kk-line { display: flex; gap: 5px; align-items: flex-end; min-width: 0; }
+  .kk-row.right .kk-line { flex-direction: row; }
+  .kk-bubble { padding: 8px 11px; border-radius: 15px; font-size: 12.5px; line-height: 1.5; word-break: break-word; text-align: left; box-shadow: 0 1px 1px rgba(0,0,0,0.04); }
+  .kk-row.left .kk-bubble { background: #fff; color: #16181a; border-top-left-radius: 4px; }
+  .kk-row.right .kk-bubble { background: #fee500; color: #3a2c00; border-top-right-radius: 4px; }
+  .kk-time { font-size: 9px; color: #46586a; white-space: nowrap; padding-bottom: 1px; }
+  .kk-item { opacity: 0; transform: translateY(9px); transition: opacity .32s ease, transform .32s ease; }
+  .kk-item.show { opacity: 1; transform: none; }
+  .kk-typing { display: inline-flex; gap: 4px; padding: 11px 13px; background: #fff; border-radius: 15px; border-top-left-radius: 4px; align-items: center; }
+  .kk-typing span { width: 6px; height: 6px; border-radius: 50%; background: #b3bcc4; animation: kkblink 1.1s infinite; }
+  .kk-typing span:nth-child(2){ animation-delay: .2s; }
+  .kk-typing span:nth-child(3){ animation-delay: .4s; }
+  @keyframes kkblink { 0%,60%,100%{opacity:.3;transform:translateY(0)} 30%{opacity:1;transform:translateY(-2px)} }
+  .kk-input { display: flex; align-items: center; gap: 9px; padding: 10px 13px 14px; background: #fff; flex-shrink: 0; }
+  .kk-input .plus { color: #9aa3ab; font-size: 18px; }
+  .kk-input .box { flex: 1; height: 30px; border-radius: 16px; background: #f0f1f3; }
+  .kk-input .send { width: 30px; height: 30px; border-radius: 50%; background: #fee500; display: flex; align-items: center; justify-content: center; font-size: 13px; color: #3a2c00; }
+  .kk-photo { width: 150px; max-width: 52vw; border-radius: 12px; overflow: hidden; background: #cdd8e2; aspect-ratio: 4/3; position: relative; flex-shrink: 0; }
+  .kk-photo .ph {
+    position: absolute; inset: 0;
+    background-image: linear-gradient(135deg, rgba(0,0,0,0.06) 0, rgba(0,0,0,0.06) 1px, transparent 1px, transparent 13px);
+    display: flex; align-items: center; justify-content: center;
+    font-family: ui-monospace, Menlo, monospace; font-size: 9px; letter-spacing: 0.1em; color: rgba(20,30,40,0.4);
+    text-align: center; padding: 6px;
+  }
+  .kk-row.right .kk-photo { box-shadow: 0 1px 2px rgba(0,0,0,0.08); }
+  .kk-photos { width: 144px; max-width: 46vw; border-radius: 12px; overflow: hidden; display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; background: #cdd8e2; flex-shrink: 0; }
+  .kk-photos .cell { position: relative; aspect-ratio: 1; overflow: hidden; background: #dbe3ea; }
+  .kk-photos .cell img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .kk-photos .cell .more { position: absolute; inset: 0; background: rgba(10,12,16,0.5); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 800; letter-spacing: -0.02em; }
+  .kk-stack { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+  .kk-row.right .kk-stack { align-items: flex-end; }
+  .talk-cta { margin-top: 34px; }
+  .talk-cta .pill-cta {
+    box-shadow: 0 8px 24px -6px rgba(0,84,248,0.55);
+  }
+  .talk-cta .pill-cta:hover {
+    background: rgb(0, 72, 214) !important;
+    box-shadow: 0 14px 34px -6px rgba(0,84,248,0.7);
+  }
+
+  .cases { padding: 72px 20px; background: var(--bg-soft); }
+  .case { background: #fff; border: 1px solid var(--line); border-radius: 18px; overflow: hidden; margin-bottom: 20px; }
+  .case-head { padding: 16px 18px 14px; border-bottom: 1px solid var(--line-2); }
+  .case-head .who { font-size: 16px; font-weight: 800; letter-spacing: -0.02em; }
+  .case-head .meta { font-size: 12px; color: var(--ink-3); margin-top: 3px; }
+  .case-flow { padding: 18px; }
+  .stage-label { display: flex; align-items: center; gap: 7px; font-size: 11px; font-weight: 800; letter-spacing: 0.08em; color: var(--ink-3); text-transform: uppercase; margin-bottom: 9px; }
+  .stage-label .sd { width: 16px; height: 16px; border-radius: 5px; display: inline-flex; align-items: center; justify-content: center; font-size: 9px; color: #fff; }
+  .stage-label .sd.b { background: #8b847c; }
+  .stage-label .sd.t { background: var(--gold); }
+  .stage-label .sd.a { background: #18b368; }
+  .case-photo { aspect-ratio: 16/10; border-radius: 12px; overflow: hidden; background: var(--bg-beige); position: relative; }
+  .case-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .case-photo .cap {
+    position: absolute; inset: 0;
+    background-image: linear-gradient(135deg, rgba(184,134,11,0.06) 0, rgba(184,134,11,0.06) 1px, transparent 1px, transparent 16px);
+    display: flex; align-items: center; justify-content: center;
+    font-family: ui-monospace, Menlo, monospace; font-size: 10px; letter-spacing: 0.14em; color: rgba(10,10,10,0.28);
+  }
+  .case-photo .ptag { position: absolute; left: 12px; bottom: 12px; background: rgba(10,10,10,0.78); color: #fff; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 999px; z-index: 2; }
+  .case-gallery { display: flex; gap: 8px; overflow-x: auto; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; padding-bottom: 4px; border-radius: 12px; }
+  .case-gallery::-webkit-scrollbar { height: 5px; }
+  .case-gallery::-webkit-scrollbar-thumb { background: var(--line); border-radius: 999px; }
+  .case-gallery .g-item { position: relative; flex: 0 0 78%; scroll-snap-align: start; aspect-ratio: 4/3; border-radius: 12px; overflow: hidden; background: var(--bg-beige); }
+  .case-gallery .g-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .case-gallery .g-item .ptag { position: absolute; left: 10px; bottom: 10px; background: rgba(10,10,10,0.78); color: #fff; font-size: 10px; font-weight: 700; padding: 3px 9px; border-radius: 999px; }
+  .gallery-hint { font-size: 11px; color: var(--ink-4); margin: 7px 0 0; text-align: center; letter-spacing: 0.02em; }
+  .case-talk { background: #b2c7d9; border-radius: 12px; padding: 13px 12px; display: flex; flex-direction: column; gap: 7px; }
+  .ct-row { display: flex; max-width: 90%; }
+  .ct-row.left { align-self: flex-start; }
+  .ct-row.right { align-self: flex-end; }
+  .ct-bubble { padding: 8px 11px; border-radius: 14px; font-size: 12.5px; line-height: 1.5; }
+  .ct-row.left .ct-bubble { background: #fff; color: #16181a; border-top-left-radius: 4px; }
+  .ct-row.right .ct-bubble { background: #fee500; color: #3a2c00; border-top-right-radius: 4px; }
+  .flow-arrow { display: flex; align-items: center; justify-content: center; gap: 8px; color: var(--ink-4); font-size: 12px; font-weight: 700; margin: 13px 0; }
+  .flow-arrow::before, .flow-arrow::after { content: ""; height: 1px; width: 36px; background: var(--line); }
+  .case-result { margin-top: 16px; padding-top: 15px; border-top: 1px solid var(--line-2); font-size: 13px; color: var(--ink-2); line-height: 1.6; }
+  .case-result b { color: var(--ink); font-weight: 700; }
+
+  .promise { background: var(--ink); color: #fff; padding: 64px 22px; }
+  .promise .label { color: var(--gold-soft); }
+  .promise h2 { color: #fff; }
+  .promise-list { display: flex; flex-direction: column; gap: 2px; margin-top: 26px; }
+  .promise-item { display: flex; gap: 15px; padding: 20px 0; border-top: 1px solid rgba(255,255,255,0.1); align-items: flex-start; }
+  .promise-item:last-child { border-bottom: 1px solid rgba(255,255,255,0.1); }
+  .promise-item .pemo { font-size: 22px; flex-shrink: 0; width: 34px; }
+  .promise-item .pt { font-size: 16px; font-weight: 700; margin: 0 0 3px; letter-spacing: -0.015em; }
+  .promise-item .pd { font-size: 13px; color: rgba(255,255,255,0.62); margin: 0; line-height: 1.6; }
 </style>
 </head>
 <body style="">
   <main class="shell" data-screen-label="Landing">
 
-    <!-- ========== 1. HERO ========== -->
-    <section class="hero" data-screen-label="01 Hero">
-      <div class="hero-bg"></div>
-      <video class="hero-video" src="hero.mp4" autoplay muted loop playsinline preload="auto"></video>
-      <div class="hero-overlay"></div>
-      <div class="hero-title" style="font-weight: 600">
-                <h1 style="letter-spacing: -0.95px; line-height: 1.8; font-weight: 700; font-family: &#39;Quanty&#39;, &#39;Noto Sans KR&#39;, sans-serif; text-transform: none; font-size: 45px">space baker<div style="font-size: 25px; font-weight: 100; font-family: &#39;Quanty&#39;, &#39;Noto Sans KR&#39;, sans-serif">
-</div></h1>
-        <div class="sub" style="font-weight: 100; font-size: 18px">스페이스베이커</div>
+    <!-- ========== 1. HERO (소통) ========== -->
+    <section class="hero-talk" data-screen-label="01 Hero">
+      <span class="live-pill"><span class="ld"></span>오늘도 현장에서 소통 중</span>
+
+      <h1>공사 중에도<br><span class="hl"><span style="color: #0054f8">매일 공유드려요</span></span></h1>
+      <p class="lead">철거부터 마감까지,<br>현장 상황을 매일 카톡으로 공유드려요.</p>
+
+      <div class="phone" aria-hidden="true">
+        <div class="phone-screen">
+          <div class="kk-head">
+            <span class="back">‹</span>
+            <span class="ava" style="font-size:11px;font-weight:800;color:#fff;letter-spacing:0.02em;">SB</span>
+            <span class="nm">스페이스베이커</span>
+            <span class="icons">⋯</span>
+          </div>
+          <div class="kk-body" id="kkBody"></div>
+          <div class="kk-input">
+            <span class="plus">＋</span>
+            <span class="box"></span>
+            <span class="send">➤</span>
+          </div>
+        </div>
       </div>
-      <div class="hero-bottom">
-        <p class="label">Vision &amp; Space +</p>
-        <p class="body" style="">당신의 공간을 감도있게 빚어냅니다.<br>모던 &amp; 미니멀 주거 인테리어 전문,<br>서울·경기 전역 무료 상담부터 시작하세요.</p>
-        <button class="pill-cta" onclick="document.getElementById('survey').scrollIntoView({behavior:'smooth', block:'start'})">
-          무료 상담 신청
+
+      <div class="talk-cta">
+        <button class="pill-cta" onclick="document.getElementById('survey').scrollIntoView({behavior:'smooth', block:'start'})" style="background-color: rgb(0, 84, 248)">
+          <span style="color: #ffffff">무료 상담 신청하기</span>
           <span class="arrow" aria-hidden="true"></span>
         </button>
       </div>
     </section>
 
-    <!-- ========== 2. STATS ========== -->
-    <section class="stats" data-screen-label="02 Stats">
-      <p class="label" style="text-align: center">By the numbers</p>
+    <!-- ========== 2. STATS (소통) ========== -->
+    <section class="stats stats-talk" data-screen-label="02 Stats">
+      <p class="label" style="text-align: center">우리의 소통은</p>
       <div class="stat-row">
         <div class="stat-cell">
-          <div class="stat-num" style="text-align: center"><span class="count-up" data-target="10">0</span><span class="unit" style="color: rgb(10, 10, 10)">+</span></div>
-          <div class="stat-label" style="text-align: center">년 경력</div>
+          <div class="stat-num" style="text-align: center"><span class="count-up" data-target="10">0</span><span class="unit" style="color: rgb(10, 10, 10)">분</span></div>
+          <div class="stat-label" style="text-align: center">평균 응답 시간</div>
         </div>
         <div class="stat-cell">
-          <div class="stat-num" style="text-align: center"><span class="count-up" data-target="200">0</span><span class="unit" style="color: rgb(10, 10, 10)">+</span></div>
-          <div class="stat-label" style="text-align: center">시공 실적</div>
+          <div class="stat-num" style="text-align: center"><span class="count-up" data-target="100">0</span><span class="unit" style="color: rgb(10, 10, 10)">%</span></div>
+          <div class="stat-label" style="text-align: center">대표 직접 응대</div>
         </div>
         <div class="stat-cell">
-          <div class="stat-num" style="text-align: center"><span class="count-up" data-target="98">0</span><span class="unit" style="color: rgb(10, 10, 10)">%</span></div>
-          <div class="stat-label" style="text-align: center">고객 만족도</div>
+          <div class="stat-num" style="text-align: center"><span class="count-up" data-target="350">0</span><span class="unit" style="color: rgb(10, 10, 10)">+</span></div>
+          <div class="stat-label" style="text-align: center">누적 상담 문의</div>
         </div>
       </div>
     </section>
 
-    <!-- ========== 3. PORTFOLIO ========== -->
-    <section class="ed portfolio" id="portfolio" data-screen-label="03 Portfolio">
-      <p class="label">Selected Projects +</p>
-      <h2>최근 시공 사례를<br>소개합니다.</h2>
+    <!-- ========== 3. 소통 사례 (before → 소통 → after) ========== -->
+    <section class="cases" data-screen-label="03 Cases">
+      <p class="label">Real Stories +</p>
+      <h2 style="margin-bottom: 8px;">소통이 만든<br>공간의 변화.</h2>
+      <p class="section-sub" style="margin-bottom: 32px;">고민에서 완성까지, 대화로 함께한 기록입니다.</p>
 
-      <div class="port-list" id="portList">
-      <div class="proj">
-        <div class="proj-img">
-          <div class="ph"><span class="ph-label">PROJECT&nbsp;PHOTO&nbsp;01</span></div>
-          <div class="num">01</div>
-          <div class="tag">차분함, 정돈된</div>
-        </div>
-        <p class="proj-tag">Project 01 · Apartment</p>
-        <h3 class="proj-title">송도 마스터뷰 49평</h3>
-        <p class="proj-desc">전체 리모델링 · 모던 화이트 톤으로<br>공간 전체를 새롭게 풀어낸 프로젝트.</p>
-      </div>
-
-      <div class="proj">
-        <div class="proj-img">
-          <div class="ph"><span class="ph-label">PROJECT&nbsp;PHOTO&nbsp;02</span></div>
-          <div class="num">02</div>
-          <div class="tag">화이트, 우드</div>
-        </div>
-        <p class="proj-tag">PROJECT 02 · APARTMENT</p>
-        <h3 class="proj-title">마포 도화 현대홈타운 32평</h3>
-        <p class="proj-desc">화이트와 따뜻한 우드 톤으로
-주방 구조의 한계를 극복한 프로젝트</p>
-      </div>
-
-      <div class="proj">
-        <div class="proj-img">
-          <div class="ph"><span class="ph-label">PROJECT&nbsp;PHOTO&nbsp;03</span></div>
-          <div class="num">03</div>
-          <div class="tag">개방감, 무게감</div>
-        </div>
-        <p class="proj-tag">PROJECT 03 · APARTMENT</p>
-        <h3 class="proj-title">배곧 호반베르디움 32평</h3>
-        <p class="proj-desc">주방구조를 넓게 구조변경을 진행하여
-좁고 답답했던 주방을 넓은 다이닝 공간으로</p>
-      </div>
-      </div>
+      <div id="caseList"></div>
     </section>
 
-    <!-- ========== 4. PROCESS ========== -->
-    <section class="process" data-screen-label="04 Process">
-      <p class="label">How we work +</p>
-      <h2>시공 프로세스</h2>
-      <p class="body">상담부터 완성까지, 모든 단계를 직접 책임집니다.</p>
+    <!-- ========== 4. 소통 약속 ========== -->
+    <section class="promise" data-screen-label="04 Promise">
+      <p class="label">Our Promise +</p>
+      <h2>이렇게 소통할게요.</h2>
 
-      <ol class="step-list">
-        <li>
-          <div class="n">01</div>
+      <div class="promise-list">
+        <div class="promise-item">
+          <span class="pemo">⚡</span>
           <div>
-            <h4 class="t">상담 신청</h4>
-            <p class="d">아래 폼으로 편하게 문의주세요. 24시간 안에 연락드립니다.</p>
+            <p class="pt">빠르게 답해요</p>
+            <p class="pd">문의 주시면 평균 10분 내에 확인하고 답장드려요. 기다리게 하지 않습니다.</p>
           </div>
-        </li>
-        <li>
-          <div class="n">02</div>
+        </div>
+        <div class="promise-item">
+          <span class="pemo">🙋</span>
           <div>
-            <h4 class="t">현장 미팅</h4>
-            <p class="d">전문가가 직접 방문해 공간 구조와 요구사항을 진단합니다.</p>
+            <p class="pt">대표가 직접 상담해요</p>
+            <p class="pd">상담부터 시공까지 한 사람이 책임지고 소통합니다. 말이 바뀌는 일이 없어요.</p>
           </div>
-        </li>
-        <li>
-          <div class="n">03</div>
+        </div>
+        <div class="promise-item">
+          <span class="pemo">📷</span>
           <div>
-            <h4 class="t">설계 · 견적</h4>
-            <p class="d">맞춤 도면과 투명한 견적을 제안드립니다.</p>
+            <p class="pt">과정을 공유해요</p>
+            <p class="pd">시공 중에도 현장 사진과 진행 상황을 카톡으로 실시간 공유드립니다.</p>
           </div>
-        </li>
-        <li>
-          <div class="n">04</div>
-          <div>
-            <h4 class="t">시공 · 완성</h4>
-            <p class="d">책임 시공 이후 A/S까지 끝까지 함께합니다.</p>
-          </div>
-        </li>
-      </ol>
+        </div>
+      </div>
     </section>
 
     <!-- ========== 5. SURVEY (multi-step form) ========== -->
@@ -2094,6 +2214,185 @@ function getAttribution() {
   }
 
   load();
+})();
+</script>
+
+<script>
+/* ========== TALK PAGE CONTENT (chat + cases) — config-driven ========== */
+(function () {
+  const TALK_ENDPOINT = 'https://script.google.com/macros/s/AKfycbyMmDJcm7cu3hvUcDaI_q20VR-gJEyHeJDCRMLMOZvGuMaWlnpgJkel-4eUbdLnLmMI/exec';
+
+  /* 기본 콘텐츠 (Admin에서 저장한 내용이 있으면 그걸로 덮어씁니다) */
+  const DEFAULT_TALK = {
+    chat: {
+      date: '시공 3일차',
+      messages: [
+        { who: 'biz',  text: '고객님 좋은 아침이에요\u00a0☀️\n오늘 철거 완료돼서 사진 보내드려요!', time: '오전 9:12' },
+        { who: 'biz',  photos: [
+            'images/site/kitchen-01.jpg','images/site/kitchen-02.jpg','images/site/kitchen-03.jpg',
+            'images/site/kitchen-04.jpg','images/site/kitchen-05.jpg','images/site/kitchen-06.jpg',
+            'images/site/kitchen-07.jpg','images/site/kitchen-08.jpg','images/site/kitchen-09.jpg'
+          ], time: '오전 9:12' },
+        { who: 'cust', text: '우와 벌써 이렇게 넓어졌네요! 😮', time: '오전 9:30' },
+        { who: 'biz',  text: '완전히 철거되어서 훨씬 시원해졌죠! 👍\n내일은 설비 및 전기 작업이 진행됩니다.', time: '오전 9:31' },
+        { who: 'cust', text: '혹시 콘센트 위치 한 군데만 바꿀 수 있을까요?', time: '오전 9:40' },
+        { who: 'biz',  text: '물론이죠! 기술팀에게 바로 전달해두겠습니다 😊', time: '오전 9:41' },
+        { who: 'cust', text: '이렇게 진행 상황 알려주셔서 너무 안심돼요 🙏', time: '오전 9:42' },
+      ]
+    },
+    cases: [
+      {
+        who: '송도동 전O성 님 · 49평 아파트',
+        meta: '전체 리모델링 · 모던 화이트',
+        beforeImages: ['images/site/before-01.jpg','images/site/before-04.jpg','images/site/before-05.jpg','images/site/before-02.jpg','images/site/before-03.jpg'],
+        afterImages: [],
+        talk: [
+          { side: 'left',  text: '주방이 너무 좁은데 구조를 바꿀 수 있을까요? 예산이 걱정돼요 😥' },
+          { side: 'right', text: '가벽 철거로 충분히 넓어져요! 비용 부담되는 부분은 우선순위 잡아서 단계별로 도와드릴게요 👍' },
+          { side: 'left',  text: '와 그럼 안심이네요 ☺️ 바로 진행할게요!' }
+        ],
+        resultQuote: '예산 안에서 제일 만족스러운 선택이었어요.',
+        resultText: '좁았던 주방이 넓은 다이닝 공간으로 바뀌었습니다.'
+      },
+      {
+        who: '판교 이O준 님 · 45평 타운하우스',
+        meta: '주방·거실 부분시공 · 미니멀 우드',
+        beforeImages: ['images/site/before-06.jpg','images/site/before-07.jpg','images/site/before-08.jpg','images/site/before-09.jpg'],
+        afterImages: [],
+        talk: [
+          { side: 'left',  text: '맞벌이라 낮에 통화가 어려워요. 저녁에 상담 가능할까요?' },
+          { side: 'right', text: '그럼요! 편하신 시간에 맞춰 카톡으로 진행 도와드릴게요 😊 사진만 보내주셔도 충분해요' },
+          { side: 'left',  text: '너무 편하네요 🙏 우드 톤 레퍼런스 보내드릴게요!' }
+        ],
+        resultQuote: '바쁜 저희 일정에 다 맞춰주셔서 감동이었어요.',
+        resultText: '따뜻한 우드 톤으로 거실 동선을 새롭게 정리했습니다.'
+      }
+    ]
+  };
+
+  let TALK = DEFAULT_TALK;
+
+  function esc(s){ return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  function br(s){ return esc(s).replace(/\n/g,'<br>'); }
+
+  /* ---------- 카톡 히어로 애니메이션 ---------- */
+  const body = document.getElementById('kkBody');
+  function dateEl(text){
+    const d = document.createElement('div');
+    d.className = 'kk-date kk-item';
+    d.textContent = text;
+    return d;
+  }
+  function msgEl(item){
+    const left = item.who === 'cust';
+    const row = document.createElement('div');
+    row.className = 'kk-row kk-item ' + (left ? 'left' : 'right');
+    let inner = '';
+    if (item.photos && item.photos.length) {
+      const imgs = item.photos.slice(0, 9);
+      const cells = imgs.map((src, idx) => {
+        const overlay = (idx === 8 && item.photos.length > 9)
+          ? '<div class="more">+' + (item.photos.length - 9) + '</div>' : '';
+        return '<div class="cell"><img src="' + esc(src) + '" alt="" loading="lazy" decoding="async">' + overlay + '</div>';
+      }).join('');
+      inner += '<div class="kk-photos">' + cells + '</div>';
+    }
+    if (item.text) inner += '<div class="kk-bubble">' + br(item.text) + '</div>';
+    inner = '<div class="kk-stack">' + inner + '</div>';
+    const timeHtml = '<span class="kk-time">' + esc(item.time||'') + '</span>';
+    if (left) {
+      row.innerHTML = '<div class="kk-ava">🙂</div><div class="kk-col"><div class="kk-line">' + inner + timeHtml + '</div></div>';
+    } else {
+      row.innerHTML = '<div class="kk-ava" style="font-size:11px;font-weight:800;color:#fff;letter-spacing:0.02em;">SB</div><div class="kk-col"><div class="kk-line">' + timeHtml + inner + '</div></div>';
+    }
+    return row;
+  }
+  function typingEl(left){
+    const row = document.createElement('div');
+    row.className = 'kk-row kk-item ' + (left ? 'left' : 'right');
+    const dots = '<div class="kk-typing"><span></span><span></span><span></span></div>';
+    row.innerHTML = left
+      ? ('<div class="kk-ava">🙂</div><div class="kk-col">' + dots + '</div>')
+      : ('<div class="kk-ava" style="font-size:11px;font-weight:800;color:#fff;letter-spacing:0.02em;">SB</div><div class="kk-col">' + dots + '</div>');
+    return row;
+  }
+  function wait(ms){ return new Promise(r => setTimeout(r, ms)); }
+  function reveal(el){ body.appendChild(el); void el.offsetWidth; el.classList.add('show'); body.scrollTop = body.scrollHeight; }
+
+  let running = false;
+  async function play(){
+    if (running) return; running = true;
+    const chat = TALK.chat || {};
+    while (true) {
+      body.innerHTML = '';
+      if (chat.date) { reveal(dateEl(chat.date)); await wait(500); }
+      for (const item of (chat.messages || [])) {
+        const left = item.who === 'cust';
+        const typing = typingEl(left);
+        reveal(typing);
+        await wait(item.photos ? 1100 : 750 + Math.min((item.text || '').length * 22, 900));
+        typing.remove();
+        reveal(msgEl(item));
+        await wait(950);
+      }
+      await wait(2600);
+    }
+  }
+
+  /* ---------- 소통 사례 렌더 ---------- */
+  function galleryHtml(imgs, label){
+    if (!imgs || !imgs.length) {
+      return '<div class="case-photo"><div class="cap">' + esc(label) + '&nbsp;PHOTO</div><span class="ptag">' + (label === 'AFTER' ? '시공 후' : '시공 전') + '</span></div>';
+    }
+    const items = imgs.map((src, i) =>
+      '<div class="g-item"><img src="' + esc(src) + '" alt="" loading="lazy" decoding="async">' +
+      (i === 0 ? '<span class="ptag">' + (label === 'AFTER' ? '시공 후' : '시공 전') + '</span>' : '') + '</div>'
+    ).join('');
+    return '<div class="case-gallery">' + items + '</div><p class="gallery-hint">← 옆으로 넘겨보세요</p>';
+  }
+  function renderCases(){
+    const wrap = document.getElementById('caseList');
+    if (!wrap) return;
+    wrap.innerHTML = (TALK.cases || []).map(c => {
+      const talk = (c.talk || []).map(t =>
+        '<div class="ct-row ' + (t.side === 'right' ? 'right' : 'left') + '"><div class="ct-bubble">' + br(t.text) + '</div></div>'
+      ).join('');
+      return '<div class="case">' +
+        '<div class="case-head"><div class="who">' + esc(c.who) + '</div><div class="meta">' + esc(c.meta) + '</div></div>' +
+        '<div class="case-flow">' +
+          '<div class="stage"><div class="stage-label"><span class="sd b">B</span>BEFORE · 고민</div>' + galleryHtml(c.beforeImages, 'BEFORE') + '</div>' +
+          '<div class="flow-arrow">소통으로 풀어가요</div>' +
+          '<div class="stage"><div class="stage-label"><span class="sd t">T</span>TALK · 소통</div><div class="case-talk">' + talk + '</div></div>' +
+          '<div class="flow-arrow">그 결과는</div>' +
+          '<div class="stage"><div class="stage-label"><span class="sd a">A</span>AFTER · 완성</div>' + galleryHtml(c.afterImages, 'AFTER') + '</div>' +
+          '<p class="case-result"><b>"' + esc(c.resultQuote) + '"</b> ' + esc(c.resultText) + '</p>' +
+        '</div></div>';
+    }).join('');
+  }
+
+  function startAll(){
+    renderCases();
+    if (body) {
+      if ('IntersectionObserver' in window) {
+        const io = new IntersectionObserver((ents) => { ents.forEach(e => { if (e.isIntersecting) { play(); io.disconnect(); } }); }, { threshold: 0.15 });
+        io.observe(body);
+      }
+      setTimeout(() => { if (!running) play(); }, 1200);
+    }
+  }
+
+  /* ---------- 원격 설정 불러오기 (있으면 덮어쓰기) ---------- */
+  (async function(){
+    try {
+      const url = TALK_ENDPOINT + (TALK_ENDPOINT.indexOf('?') >= 0 ? '&' : '?') + 'action=talkConfig&t=' + Date.now();
+      const res = await fetch(url);
+      const data = await res.json();
+      if (data && data.ok && data.config && data.config.chat) {
+        TALK = data.config;
+      }
+    } catch (e) { /* 실패 시 기본값 사용 */ }
+    startAll();
+  })();
 })();
 </script>
 
