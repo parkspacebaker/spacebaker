@@ -279,6 +279,28 @@
   .modal-foot .save { background: var(--gold); color: #fff; }
   .modal-foot .save:disabled { opacity: 0.5; }
 
+  /* ===== Talk editor ===== */
+  .tk-sec { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; margin-bottom: 18px; }
+  .tk-sec-h { font-size: 15px; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 14px; }
+  .mf-l { display: block; font-size: 12px; font-weight: 700; color: var(--ink-2); margin: 12px 0 6px; }
+  .mf-in { width: 100%; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; font-size: 13.5px; font-family: inherit; -webkit-appearance: none; background: #fff; }
+  .mf-in:focus { outline: none; border-color: var(--ink); }
+  textarea.mf-in { min-height: 54px; resize: vertical; line-height: 1.5; }
+  .tk-msg { border: 1px solid var(--line); border-radius: 10px; padding: 11px; margin-bottom: 9px; background: var(--bg); }
+  .tk-msg.tk-photo { background: var(--bg-soft); }
+  .tk-msg-top { display: flex; gap: 7px; align-items: center; margin-bottom: 7px; }
+  .tk-badge { font-size: 12px; font-weight: 700; color: var(--ink-3); flex: 1; }
+  .tk-x { width: 26px; height: 26px; flex-shrink: 0; border: 1px solid var(--line); background: #fff; border-radius: 7px; cursor: pointer; color: var(--red); font-size: 12px; }
+  .tk-x:hover { border-color: var(--red); }
+  .tk-add { margin-top: 8px; padding: 9px 14px; border: 1px dashed var(--line); background: #fff; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; color: var(--ink-2); }
+  .tk-add:hover { border-color: var(--ink-4); }
+  .tk-case { border: 1px solid var(--line); border-radius: 12px; padding: 16px; margin-bottom: 14px; }
+  .tk-case-h { font-size: 14px; font-weight: 800; display: flex; justify-content: space-between; align-items: center; }
+  .tk-imgnote { font-size: 12px; color: var(--ink-3); padding: 8px 11px; background: var(--bg); border-radius: 8px; }
+  .tk-bubbles { display: flex; flex-direction: column; gap: 7px; }
+  .tk-bubble { display: flex; gap: 7px; align-items: center; }
+  .tk-save-bar { display: flex; align-items: center; gap: 14px; padding: 6px 2px 30px; }
+
   @media (max-width: 1100px) { .stat-grid { grid-template-columns: 1fr 1fr; } .cols { grid-template-columns: 1fr; } .mini-grid { grid-template-columns: 1fr; } }
   @media (max-width: 760px) { .sidebar { display: none; } .content { padding: 18px 16px 50px; } .topbar { padding: 16px; } .search-box input { width: 130px; } }
 </style>
@@ -319,6 +341,10 @@
     <div class="nav-item" data-view="portfolio">
       <svg viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="14" rx="2" stroke="currentColor" stroke-width="1.7"/><path d="M3 9h18M8 14h2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
       포트폴리오
+    </div>
+    <div class="nav-item" data-view="talk">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M4 5h16v11H8l-4 4z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>
+      소통 페이지
     </div>
     <div class="sidebar-foot">
       <div class="me">
@@ -405,6 +431,12 @@
           </button>
         </div>
         <div id="portfolioGrid" class="pf-grid"></div>
+      </div>
+
+      <!-- TALK PAGE -->
+      <div class="view" id="view-talk">
+        <div style="font-size:13px;color:var(--ink-3);margin-bottom:18px;">소통 페이지(talk.html)의 카톡 대화와 소통 사례 내용을 수정합니다. 저장하면 즉시 반영됩니다.</div>
+        <div id="talkEditor"></div>
       </div>
 
     </div>
@@ -989,13 +1021,161 @@ $('addProjectBtn').addEventListener('click',()=>openProjectModal(null));
 $('pfModalOverlay').addEventListener('click',closeProjectModal);
 
 
+/* ====== TALK PAGE EDITOR ====== */
+let TALK_CFG = null;
+const TALK_DEFAULT = {
+  chat: {
+    date: '시공 3일차',
+    messages: [
+      { who: 'biz',  text: '고객님 좋은 아침이에요 ☀️\n오늘 철거 완료돼서 사진 보내드려요!', time: '오전 9:12' },
+      { who: 'biz',  photos: ['images/site/kitchen-01.jpg','images/site/kitchen-02.jpg','images/site/kitchen-03.jpg','images/site/kitchen-04.jpg','images/site/kitchen-05.jpg','images/site/kitchen-06.jpg','images/site/kitchen-07.jpg','images/site/kitchen-08.jpg','images/site/kitchen-09.jpg'], time: '오전 9:12' },
+      { who: 'cust', text: '우와 벌써 이렇게 넓어졌네요! 😮', time: '오전 9:30' },
+      { who: 'biz',  text: '완전히 철거되어서 훨씬 시원해졌죠! 👍\n내일은 설비 및 전기 작업이 진행됩니다.', time: '오전 9:31' },
+      { who: 'cust', text: '혹시 콘센트 위치 한 군데만 바꿀 수 있을까요?', time: '오전 9:40' },
+      { who: 'biz',  text: '물론이죠! 기술팀에게 바로 전달해두겠습니다 😊', time: '오전 9:41' },
+      { who: 'cust', text: '이렇게 진행 상황 알려주셔서 너무 안심돼요 🙏', time: '오전 9:42' }
+    ]
+  },
+  cases: [
+    { who:'송도동 전O성 님 · 49평 아파트', meta:'전체 리모델링 · 모던 화이트',
+      beforeImages:['images/site/before-01.jpg','images/site/before-04.jpg','images/site/before-05.jpg','images/site/before-02.jpg','images/site/before-03.jpg'], afterImages:[],
+      talk:[{side:'left',text:'주방이 너무 좁은데 구조를 바꿀 수 있을까요? 예산이 걱정돼요 😥'},{side:'right',text:'가벽 철거로 충분히 넓어져요! 비용 부담되는 부분은 우선순위 잡아서 단계별로 도와드릴게요 👍'},{side:'left',text:'와 그럼 안심이네요 ☺️ 바로 진행할게요!'}],
+      resultQuote:'예산 안에서 제일 만족스러운 선택이었어요.', resultText:'좁았던 주방이 넓은 다이닝 공간으로 바뀌었습니다.' },
+    { who:'판교 이O준 님 · 45평 타운하우스', meta:'주방·거실 부분시공 · 미니멀 우드',
+      beforeImages:['images/site/before-06.jpg','images/site/before-07.jpg','images/site/before-08.jpg','images/site/before-09.jpg'], afterImages:[],
+      talk:[{side:'left',text:'맞벌이라 낮에 통화가 어려워요. 저녁에 상담 가능할까요?'},{side:'right',text:'그럼요! 편하신 시간에 맞춰 카톡으로 진행 도와드릴게요 😊 사진만 보내주셔도 충분해요'},{side:'left',text:'너무 편하네요 🙏 우드 톤 레퍼런스 보내드릴게요!'}],
+      resultQuote:'바쁜 저희 일정에 다 맞춰주셔서 감동이었어요.', resultText:'따뜻한 우드 톤으로 거실 동선을 새롭게 정리했습니다.' }
+  ]
+};
+
+function clone(o){ return JSON.parse(JSON.stringify(o)); }
+
+async function loadTalk(){
+  const wrap = $('talkEditor');
+  wrap.innerHTML = '<div class="pf-empty"><div style="width:28px;height:28px;border:3px solid var(--line);border-top-color:var(--gold);border-radius:50%;margin:0 auto 14px;animation:spin .8s linear infinite;"></div>불러오는 중…</div>';
+  try {
+    const r = await apiPost({ action:'talkConfigLoad', password:PASSWORD });
+    TALK_CFG = (r.ok && r.config && r.config.chat) ? r.config : clone(TALK_DEFAULT);
+  } catch(e){ TALK_CFG = clone(TALK_DEFAULT); }
+  // ensure shape
+  if(!TALK_CFG.chat) TALK_CFG.chat = clone(TALK_DEFAULT.chat);
+  if(!TALK_CFG.cases) TALK_CFG.cases = clone(TALK_DEFAULT.cases);
+  renderTalkEditor();
+}
+
+function renderTalkEditor(){
+  const c = TALK_CFG;
+  const chatRows = c.chat.messages.map((m,i)=>{
+    if(m.photos){
+      return `<div class="tk-msg tk-photo">
+        <div class="tk-msg-top"><span class="tk-badge">📷 사진 ${m.photos.length}장 (현장 사진은 자동 표시)</span>
+        <button class="tk-x" data-delmsg="${i}">✕</button></div>
+        <input class="mf-in" data-msgtime="${i}" value="${escAttr(m.time||'')}" placeholder="시간 (예: 오전 9:12)" style="max-width:160px;">
+      </div>`;
+    }
+    return `<div class="tk-msg">
+      <div class="tk-msg-top">
+        <select class="mf-in tk-who" data-msgwho="${i}" style="max-width:130px;">
+          <option value="biz" ${m.who==='biz'?'selected':''}>우리(SB)</option>
+          <option value="cust" ${m.who==='cust'?'selected':''}>고객</option>
+        </select>
+        <input class="mf-in" data-msgtime="${i}" value="${escAttr(m.time||'')}" placeholder="시간" style="max-width:120px;">
+        <button class="tk-x" data-delmsg="${i}">✕</button>
+      </div>
+      <textarea class="mf-in tk-ta" data-msgtext="${i}" placeholder="메시지 내용">${escHtml(m.text||'')}</textarea>
+    </div>`;
+  }).join('');
+
+  const caseRows = c.cases.map((cs,ci)=>{
+    const bubbles = cs.talk.map((t,ti)=>`
+      <div class="tk-bubble">
+        <select class="mf-in" data-bside="${ci}-${ti}" style="max-width:110px;">
+          <option value="left" ${t.side==='left'?'selected':''}>고객</option>
+          <option value="right" ${t.side==='right'?'selected':''}>우리(SB)</option>
+        </select>
+        <input class="mf-in" data-btext="${ci}-${ti}" value="${escAttr(t.text)}" placeholder="말풍선 내용" style="flex:1;">
+        <button class="tk-x" data-delbubble="${ci}-${ti}">✕</button>
+      </div>`).join('');
+    return `<div class="tk-case">
+      <div class="tk-case-h">사례 ${ci+1} <button class="tk-x" data-delcase="${ci}" title="사례 삭제">✕</button></div>
+      <label class="mf-l">고객/평형</label><input class="mf-in" data-cwho="${ci}" value="${escAttr(cs.who)}">
+      <label class="mf-l">시공 정보</label><input class="mf-in" data-cmeta="${ci}" value="${escAttr(cs.meta)}">
+      <label class="mf-l">BEFORE 사진</label><div class="tk-imgnote">${(cs.beforeImages||[]).length}장 — 사진 교체는 GitHub의 images/site 폴더에서</div>
+      <label class="mf-l">AFTER 사진</label><div class="tk-imgnote">${(cs.afterImages||[]).length}장${(cs.afterImages||[]).length?'':' (없으면 placeholder 표시)'}</div>
+      <label class="mf-l">대화 (TALK)</label>
+      <div class="tk-bubbles">${bubbles}</div>
+      <button class="tk-add" data-addbubble="${ci}">+ 말풍선 추가</button>
+      <label class="mf-l">결과 후기 (강조)</label><input class="mf-in" data-cquote="${ci}" value="${escAttr(cs.resultQuote)}">
+      <label class="mf-l">결과 설명</label><input class="mf-in" data-ctext="${ci}" value="${escAttr(cs.resultText)}">
+    </div>`;
+  }).join('');
+
+  $('talkEditor').innerHTML = `
+    <div class="tk-sec">
+      <div class="tk-sec-h">📱 히어로 카톡 대화</div>
+      <label class="mf-l">날짜 구분선</label>
+      <input class="mf-in" id="tkDate" value="${escAttr(c.chat.date||'')}" placeholder="예: 시공 3일차" style="max-width:220px;">
+      <label class="mf-l" style="margin-top:14px;">메시지</label>
+      <div id="tkMsgs">${chatRows}</div>
+      <button class="tk-add" id="tkAddMsg">+ 메시지 추가</button>
+    </div>
+    <div class="tk-sec">
+      <div class="tk-sec-h">💬 소통 사례</div>
+      <div id="tkCases">${caseRows}</div>
+      <button class="tk-add" id="tkAddCase">+ 사례 추가</button>
+    </div>
+    <div class="tk-save-bar">
+      <button class="btn-add" id="tkSave" style="background:var(--gold);">변경사항 저장</button>
+      <span style="font-size:12px;color:var(--ink-3);">저장하면 talk.html에 즉시 반영됩니다</span>
+    </div>`;
+  bindTalkEditor();
+}
+
+function escAttr(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
+function escHtml(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function bindTalkEditor(){
+  const c = TALK_CFG;
+  $('tkDate').addEventListener('input',e=>c.chat.date=e.target.value);
+  // message fields
+  $('talkEditor').querySelectorAll('[data-msgwho]').forEach(el=>el.addEventListener('change',e=>{c.chat.messages[+el.dataset.msgwho].who=e.target.value;}));
+  $('talkEditor').querySelectorAll('[data-msgtime]').forEach(el=>el.addEventListener('input',e=>{c.chat.messages[+el.dataset.msgtime].time=e.target.value;}));
+  $('talkEditor').querySelectorAll('[data-msgtext]').forEach(el=>el.addEventListener('input',e=>{c.chat.messages[+el.dataset.msgtext].text=e.target.value;}));
+  $('talkEditor').querySelectorAll('[data-delmsg]').forEach(el=>el.addEventListener('click',()=>{c.chat.messages.splice(+el.dataset.delmsg,1);renderTalkEditor();}));
+  $('tkAddMsg').addEventListener('click',()=>{c.chat.messages.push({who:'biz',text:'',time:''});renderTalkEditor();});
+  // case fields
+  $('talkEditor').querySelectorAll('[data-cwho]').forEach(el=>el.addEventListener('input',e=>{c.cases[+el.dataset.cwho].who=e.target.value;}));
+  $('talkEditor').querySelectorAll('[data-cmeta]').forEach(el=>el.addEventListener('input',e=>{c.cases[+el.dataset.cmeta].meta=e.target.value;}));
+  $('talkEditor').querySelectorAll('[data-cquote]').forEach(el=>el.addEventListener('input',e=>{c.cases[+el.dataset.cquote].resultQuote=e.target.value;}));
+  $('talkEditor').querySelectorAll('[data-ctext]').forEach(el=>el.addEventListener('input',e=>{c.cases[+el.dataset.ctext].resultText=e.target.value;}));
+  $('talkEditor').querySelectorAll('[data-bside]').forEach(el=>el.addEventListener('change',e=>{const[ci,ti]=el.dataset.bside.split('-').map(Number);c.cases[ci].talk[ti].side=e.target.value;}));
+  $('talkEditor').querySelectorAll('[data-btext]').forEach(el=>el.addEventListener('input',e=>{const[ci,ti]=el.dataset.btext.split('-').map(Number);c.cases[ci].talk[ti].text=e.target.value;}));
+  $('talkEditor').querySelectorAll('[data-delbubble]').forEach(el=>el.addEventListener('click',()=>{const[ci,ti]=el.dataset.delbubble.split('-').map(Number);c.cases[ci].talk.splice(ti,1);renderTalkEditor();}));
+  $('talkEditor').querySelectorAll('[data-addbubble]').forEach(el=>el.addEventListener('click',()=>{c.cases[+el.dataset.addbubble].talk.push({side:'left',text:''});renderTalkEditor();}));
+  $('talkEditor').querySelectorAll('[data-delcase]').forEach(el=>el.addEventListener('click',()=>{if(confirm('이 사례를 삭제할까요?')){c.cases.splice(+el.dataset.delcase,1);renderTalkEditor();}}));
+  $('tkAddCase').addEventListener('click',()=>{c.cases.push({who:'',meta:'',beforeImages:[],afterImages:[],talk:[{side:'left',text:''}],resultQuote:'',resultText:''});renderTalkEditor();});
+  $('tkSave').addEventListener('click',saveTalk);
+}
+
+async function saveTalk(){
+  const btn=$('tkSave'); btn.disabled=true; btn.textContent='저장 중…';
+  try {
+    const r = await apiPost({ action:'talkConfigSave', password:PASSWORD, config:TALK_CFG });
+    if(!r.ok) throw new Error(r.error||'failed');
+    toast('저장됐습니다 — talk.html에 반영됩니다');
+  } catch(e){ toast('저장 실패: '+(e.message||e)); }
+  btn.disabled=false; btn.textContent='변경사항 저장';
+}
+
+
 /* ====== VIEW SWITCH ====== */
 let activeView='dashboard';
 const VIEW_META = {
   dashboard:{title:'대시보드',sub:'마케팅 유입과 상담 신청을 한눈에'},
   inquiries:{title:'상담 신청',sub:'신청 내역 관리 및 상태 변경'},
   marketing:{title:'마케팅 분석',sub:'유입 경로별 성과 분석'},
-  portfolio:{title:'포트폴리오',sub:'랜딩페이지 시공 사례 관리'}
+  portfolio:{title:'포트폴리오',sub:'랜딩페이지 시공 사례 관리'},
+  talk:{title:'소통 페이지',sub:'talk.html 카톡 대화·소통 사례 편집'}
 };
 function showView(v){
   activeView=v;
@@ -1005,6 +1185,7 @@ function showView(v){
   $('viewTitle').textContent=VIEW_META[v].title;
   $('viewSub').textContent=VIEW_META[v].sub;
   if(v==='portfolio') loadPortfolio();
+  if(v==='talk') loadTalk();
 }
 document.querySelectorAll('.nav-item').forEach(n=>n.addEventListener('click',()=>showView(n.dataset.view)));
 document.addEventListener('click',e=>{ const g=e.target.closest('[data-goto]'); if(g) showView(g.dataset.goto); });
